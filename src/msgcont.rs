@@ -2,7 +2,7 @@
 
 bitfield!{
     #[repr(C)]
-    pub struct DaqContent([u32]);
+    pub struct Daq([u32]);
     impl Debug;
     u32;
     pub u8, daq_on, set_daq_on: 0, 0;//1
@@ -21,7 +21,7 @@ bitfield!{
 bitfield!{
 
     #[repr(C)]
-    pub struct TrigContent1([u32]);
+    pub struct Trig1([u32]);
     impl Debug;
     u32;
     pub u8, st, set_st:0,0;
@@ -43,7 +43,7 @@ bitfield!{
 
 bitfield!{
     #[repr(C)]
-    pub struct TrigContent2([u32]);
+    pub struct Trig2([u32]);
     impl Debug;
     u32;
     pub u8, st, set_st:0,0;
@@ -53,12 +53,20 @@ bitfield!{
 
 bitfield!{
     #[repr(C)]
-    pub struct GpsContent([u32]);
+    pub struct Gps([u32]);
     impl Debug;
     u32;
     pub u8, rwb, set_rwb:0,0;//1
     pub u8, addr, set_addr:7,1;//7
     pub u8, wrd, set_wrd:13,8;//6
+}
+
+bitfield!{
+    #[repr(C)]
+    pub struct Adc([u32]);
+    impl Debug;
+    u16;
+    pub u16, data, set_data: 15,0;//16
 }
 
 bitfield!{

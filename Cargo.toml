@@ -5,3 +5,4 @@ authors = ["Gu Junhua <jhgu@nao.cas.cn>"]
 
 [dependencies]
 bitfield = "0.13.0"
+either = "1.5.0"
