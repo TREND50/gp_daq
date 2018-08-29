@@ -1,7 +1,9 @@
 //use bitfield::*;
+use std::convert::From;
 
 bitfield!{
     #[repr(C)]
+    #[derive(Default)]
     pub struct Daq([u32]);
     impl Debug;
     u32;
@@ -18,10 +20,21 @@ bitfield!{
     pub u8, att2, set_att2:32+13,32+7;//7
 }
 
+impl<'a> From<&'a [u32]> for Daq<[u32;2]>{
+    fn from(data:&'a [u32])->Self{
+        let mut result=[0_u32;2];
+        result.copy_from_slice(&data[..2]);
+        Daq(result)
+    }
+}
+
+
+
 bitfield!{
 
     #[repr(C)]
-    pub struct Trig1([u32]);
+    #[derive(Default)]
+    pub struct Trig([u32]);
     impl Debug;
     u32;
     pub u8, st, set_st:0,0;
@@ -41,18 +54,21 @@ bitfield!{
     pub u16,th3p, set_th3p:96+23, 96+12;
 }
 
-bitfield!{
-    #[repr(C)]
-    pub struct Trig2([u32]);
-    impl Debug;
-    u32;
-    pub u8, st, set_st:0,0;
-    pub u8, trg_en, set_trg_en:6, 1;
-    pub u16,cntrl_dac, set_cntrl_dac:23,8;
+impl<'a> From<&'a [u32]> for Trig<[u32;4]>{
+    fn from(data:&'a [u32])->Self{
+        let mut result=[0_u32;4];
+        match data[0]&0x80_00_00{
+            1 => result[0]=data[0],
+            _ => result.copy_from_slice(&data[..4]),
+        }
+        Trig(result)
+    }
 }
+
 
 bitfield!{
     #[repr(C)]
+    #[derive(Default)]
     pub struct Gps([u32]);
     impl Debug;
     u32;
@@ -61,24 +77,38 @@ bitfield!{
     pub u8, wrd, set_wrd:13,8;//6
 }
 
+impl<'a> From<&'a [u32]> for Gps<[u32;1]>{
+    fn from(data:&'a [u32])->Self{
+        let mut result=[0_u32;1];
+        result.copy_from_slice(&data[..1]);
+        Gps(result)
+    }
+}
+
+
 bitfield!{
     #[repr(C)]
+    #[derive(Default)]
     pub struct Adc([u32]);
     impl Debug;
     u16;
     pub u16, data, set_data: 15,0;//16
 }
 
-bitfield!{
-    #[repr(C)]
-    pub struct IntReg1([u32]);
-    impl Debug;
-    pub u8, y,set_y:0,0;
+impl<'a> From<&'a [u32]> for Adc<[u32;1]>{
+    fn from(data:&'a [u32])->Self{
+        let mut result=[0_u32;1];
+        result.copy_from_slice(&data[..1]);
+        Adc(result)
+    }
 }
+
+
 
 bitfield!{
     #[repr(C)]
-    pub struct IntReg2([u32]);
+    #[derive(Default)]
+    pub struct IntReg([u32]);
     impl Debug;
     u32;
     pub u8, y,set_y:0,0;
@@ -96,9 +126,21 @@ bitfield!{
     pub u16, port2, set_port2:320+15,320+0;
 }
 
+impl<'a> From<&'a [u32]> for IntReg<[u32;11]>{
+    fn from(data:&'a [u32])->Self{
+        let mut result=[0_u32;11];
+        match data[0]&1{
+            1 => result.copy_from_slice(&data[..11]),
+            _ => ()
+        }
+        IntReg(result)
+    }
+}
+
 
 bitfield!{
     #[repr(C)]
+    #[derive(Default)]
     pub struct Data([u32]);
     impl Debug;
     u32;
@@ -110,8 +152,18 @@ bitfield!{
     pub u8, trig_pattern, set_trig_pattern:128+5, 128+0;
 }
 
+impl<'a> From<&'a [u32]> for Data<[u32;5]>{
+    fn from(data:&'a [u32])->Self{
+        let mut result=[0_u32;5];
+        result.copy_from_slice(&data[..4]);
+        Data(result)
+    }
+}
+
+
 bitfield!{
     #[repr(C)]
+    #[derive(Default)]
     pub struct Slc([u32]);
     impl Debug;
     u32;
@@ -144,8 +196,18 @@ bitfield!{
     pub max_coarse, set_max_coarse:480+31, 480+0;
 }
 
+impl<'a> From<&'a [u32]> for Slc<[u32;16]>{
+    fn from(data:&'a [u32])->Self{
+        let mut result=[0_u32;16];
+        result.copy_from_slice(&data[..16]);
+        Slc(result)
+    }
+}
+
+
 bitfield!{
     #[repr(C)]
+    #[derive(Default)]
     pub struct RdIntReg([u32]);
     impl Debug;
     u32;
@@ -165,11 +227,29 @@ bitfield!{
     pub u64, serial, set_serial:352+63, 352+0;
 }
 
+impl<'a> From<&'a [u32]> for RdIntReg<[u32;13]>{
+    fn from(data:&'a [u32])->Self{
+        let mut result=[0_u32;13];
+        result.copy_from_slice(&data[..13]);
+        RdIntReg(result)
+    }
+}
+
+
 bitfield!{
     #[repr(C)]
+    #[derive(Default)]
     pub struct Ack([u32]);
     impl Debug;
     u32;
     pub i32,ip, set_ip:31, 0;
     pub u16, msg_ack, set_msg_ack:32+15, 32+0;
+}
+
+impl<'a> From<&'a [u32]> for Ack<[u32;2]>{
+    fn from(data:&'a [u32])->Self{
+        let mut result=[0_u32;2];
+        result.copy_from_slice(&data[..2]);
+        Ack(result)
+    }
 }

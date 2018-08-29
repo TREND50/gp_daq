@@ -1,16 +1,17 @@
 extern crate grandproto_rs;
+extern crate serde_yaml;
 
+use std::fs::File;
+use std::io::Read;
+
+use serde_yaml::{from_reader, Value};
+use std::convert::From;
 use grandproto_rs::msgcont::Daq;
 
+use grandproto_rs::cfg::*;
 fn main() {
-    let mut my=Daq::<[u32;2]>([0x00, 0x00]);
-    my.set_daq_on(1);
-    my.set_cal_on(1);
-    my.set_offst(0xff);
-    my.set_le(1);
-    my.set_att2(0x22);
-    println!("{}",my.daq_on());
-    //println!("{}", std::mem::size_of::<Daq<[u32;2]>>());
-    println!("{}", my.0[1]);
-    println!("{}", my.0.len());
+    let node:Value=from_reader(File::open("a.yml").unwrap()).unwrap();
+    println!("{:?}", node);
+    let bb=load_vec_u64(&node, "aa").unwrap();
+    println!("{:?}", bb);
 }
