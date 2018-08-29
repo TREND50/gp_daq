@@ -104,7 +104,8 @@ impl YamlIOable for msgcont::Daq<[u32;2]>{
     (dis_pd, set_dis_pd, store_u8, load_u8),
     (dis_lna, set_dis_lna, store_u8, load_u8),
     (le, set_le, store_u8, load_u8),
-    (att1, set_att1, store_u8, load_u8)
+    (att1, set_att1, store_u8, load_u8),
+    (att2, set_att2, store_u8, load_u8)
     ];
 }
 
