@@ -242,7 +242,7 @@ bitfield!{
     pub struct Ack([u32]);
     impl Debug;
     u32;
-    pub i32,ip, set_ip:31, 0;
+    pub u32,ip, set_ip:31, 0;
     pub u16, msg_ack, set_msg_ack:32+15, 32+0;
 }
 

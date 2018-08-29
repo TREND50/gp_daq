@@ -25,7 +25,6 @@ impl TrendMsg{
     }
 
     pub fn type_code(&self)->u32{
-        
         match self{
             &TrendMsg::Daq{..}=>0x5000,
             &TrendMsg::Trig{..}=>0x5100,
@@ -37,6 +36,21 @@ impl TrendMsg{
             &TrendMsg::Slc{..}=>0x5B00,
             &TrendMsg::RdIntReg{..}=>0x5C00,
             &TrendMsg::Ack{..}=>0x5D00,
+        }
+    }
+
+    pub fn type_name(&self)->&str{
+        match self{
+            &TrendMsg::Daq{..}=>"DAQ",
+            &TrendMsg::Trig{..}=>"TRIG",
+            &TrendMsg::SlcReq{..}=>"SLCREQ",
+            &TrendMsg::Gps{..}=>"GPS",
+            &TrendMsg::Adc{..}=>"ADC",
+            &TrendMsg::IntReg{..}=>"INTREG",
+            &TrendMsg::Data{..}=>"DATA",
+            &TrendMsg::Slc{..}=>"SLC",
+            &TrendMsg::RdIntReg{..}=>"RDINTREG",
+            &TrendMsg::Ack{..}=>"ACK",
         }
     }
 
