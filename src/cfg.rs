@@ -1,9 +1,8 @@
 use super::msg;
 use super::msgcont;
 
-
+use serde_yaml::{Mapping, Value};
 use std::default::Default;
-use serde_yaml::{Value, Mapping};
 
 pub fn load_vec_u64(data: &Value, k: &str) -> Option<Vec<u64>> {
     data[k]
@@ -29,7 +28,7 @@ pub fn load_vec_u8(data: &Value, k: &str) -> Option<Vec<u8>> {
         .map(|x| x.iter().map(|ref x| x.as_u64().unwrap() as u8).collect())
 }
 
-pub fn load_str(data:&Value, k:&str)->Option<String>{
+pub fn load_str(data: &Value, k: &str) -> Option<String> {
     data[k].as_str().map(|ref x| x.to_string())
 }
 
@@ -49,20 +48,20 @@ pub fn load_u8(data: &Value, k: &str) -> Option<u8> {
     data[k].as_u64().map(|x| x as u8)
 }
 
-pub fn store_u64(data:&mut Value, k:&str, v:u64){
-    data[k]=From::from(v);
+pub fn store_u64(data: &mut Value, k: &str, v: u64) {
+    data[k] = From::from(v);
 }
 
-pub fn store_u32(data:&mut Value, k:&str, v:u32){
-    data[k]=From::from(v);
+pub fn store_u32(data: &mut Value, k: &str, v: u32) {
+    data[k] = From::from(v);
 }
 
-pub fn store_u16(data:&mut Value, k:&str, v:u16){
-    data[k]=From::from(v);
+pub fn store_u16(data: &mut Value, k: &str, v: u16) {
+    data[k] = From::from(v);
 }
 
-pub fn store_u8(data:&mut Value, k:&str, v:u8){
-    data[k]=From::from(v);
+pub fn store_u8(data: &mut Value, k: &str, v: u8) {
+    data[k] = From::from(v);
 }
 
 macro_rules! yaml_io{
@@ -88,43 +87,42 @@ macro_rules! yaml_io{
     }
 }
 
-pub trait YamlIOable{
-    fn from_yaml(cfg:&Value)->Self;
-    fn to_yaml(&self)->Value;
+pub trait YamlIOable {
+    fn from_yaml(cfg: &Value) -> Self;
+    fn to_yaml(&self) -> Value;
 }
 
-impl YamlIOable for msgcont::Daq<[u32;2]>{
-
-    yaml_io![(daq_on,set_daq_on, store_u8, load_u8),
-    (cal_on, set_cal_on, store_u8, load_u8),
-    (rd_wr_plus, set_rd_wr_plus, store_u8, load_u8),
-    (en_osc, set_en_osc, store_u8, load_u8),
-    (cntrl_adc, set_cntrl_adc, store_u8, load_u8),
-    (offst, set_offst, store_u16, load_u16),
-    (dis_pd, set_dis_pd, store_u8, load_u8),
-    (dis_lna, set_dis_lna, store_u8, load_u8),
-    (le, set_le, store_u8, load_u8),
-    (att1, set_att1, store_u8, load_u8),
-    (att2, set_att2, store_u8, load_u8)
-    ];
-}
-
-
-impl YamlIOable for msgcont::Trig<[u32;4]>{
+impl YamlIOable for msgcont::Daq {
     yaml_io![
-    (st, set_st, store_u8, load_u8),
-    (trg_en, set_trg_en, store_u8, load_u8),
-    (cntrl_dac, set_cntrl_dac,store_u16, load_u16),
-    (th1m, set_th1m, store_u16, load_u16),
-    (th1p, set_th1p, store_u16, load_u16),
-    (th2m, set_th2m, store_u16, load_u16),
-    (th2p, set_th2p, store_u16, load_u16),
-    (th3m, set_th3m, store_u16, load_u16),
-    (th3p, set_th3p, store_u16, load_u16)
+        (daq_on, set_daq_on, store_u8, load_u8),
+        (cal_on, set_cal_on, store_u8, load_u8),
+        (rd_wr_plus, set_rd_wr_plus, store_u8, load_u8),
+        (en_osc, set_en_osc, store_u8, load_u8),
+        (cntrl_adc, set_cntrl_adc, store_u8, load_u8),
+        (offst, set_offst, store_u16, load_u16),
+        (dis_pd, set_dis_pd, store_u8, load_u8),
+        (dis_lna, set_dis_lna, store_u8, load_u8),
+        (le, set_le, store_u8, load_u8),
+        (att1, set_att1, store_u8, load_u8),
+        (att2, set_att2, store_u8, load_u8)
     ];
 }
 
-impl YamlIOable for msgcont::Gps<[u32;1]>{
+impl YamlIOable for msgcont::Trig {
+    yaml_io![
+        (st, set_st, store_u8, load_u8),
+        (trg_en, set_trg_en, store_u8, load_u8),
+        (cntrl_dac, set_cntrl_dac, store_u16, load_u16),
+        (th1m, set_th1m, store_u16, load_u16),
+        (th1p, set_th1p, store_u16, load_u16),
+        (th2m, set_th2m, store_u16, load_u16),
+        (th2p, set_th2p, store_u16, load_u16),
+        (th3m, set_th3m, store_u16, load_u16),
+        (th3p, set_th3p, store_u16, load_u16)
+    ];
+}
+
+impl YamlIOable for msgcont::Gps {
     yaml_io![
         (rwb, set_rwb, store_u8, load_u8),
         (addr, set_addr, store_u8, load_u8),
@@ -132,27 +130,25 @@ impl YamlIOable for msgcont::Gps<[u32;1]>{
     ];
 }
 
-impl YamlIOable for msgcont::Adc<[u32;1]>{
-    yaml_io![
-        (data, set_data, store_u16, load_u16)
-    ];
+impl YamlIOable for msgcont::Adc {
+    yaml_io![(data, set_data, store_u16, load_u16)];
 }
 
-impl YamlIOable for msgcont::IntReg<[u32;11]>{
+impl YamlIOable for msgcont::IntReg {
     yaml_io![
         (y, set_y, store_u8, load_u8),
         (board_mac, set_board_mac, store_u32, load_u32),
-        (board_ip, set_board_ip,store_u32, load_u32),
+        (board_ip, set_board_ip, store_u32, load_u32),
         (dst_mac1, set_dst_mac1, store_u64, load_u64),
-        (dst_ip1,set_dst_ip1,store_u32, load_u32),
-        (dst_mac2, set_dst_mac2,store_u64, load_u64),
-        (dst_ip2,set_dst_ip2,store_u32, load_u32),
+        (dst_ip1, set_dst_ip1, store_u32, load_u32),
+        (dst_mac2, set_dst_mac2, store_u64, load_u64),
+        (dst_ip2, set_dst_ip2, store_u32, load_u32),
         (port1, set_port1, store_u16, load_u16),
         (port2, set_port2, store_u16, load_u16)
     ];
 }
 
-impl YamlIOable for msgcont::Data<[u32;5]>{
+impl YamlIOable for msgcont::Data {
     yaml_io![
         (ip, set_ip, store_u32, load_u32),
         (ts2, set_ts2, store_u32, load_u32),
@@ -164,7 +160,7 @@ impl YamlIOable for msgcont::Data<[u32;5]>{
     ];
 }
 
-impl YamlIOable for msgcont::Slc<[u32;16]>{
+impl YamlIOable for msgcont::Slc {
     yaml_io![
         (ip, set_ip, store_u32, load_u32),
         (vpower1, set_vpower1, store_u16, load_u16),
@@ -180,7 +176,6 @@ impl YamlIOable for msgcont::Slc<[u32;16]>{
         (th3m, set_th3m, store_u16, load_u16),
         (th3p, set_th3p, store_u16, load_u16),
         (temp, set_temp, store_u16, load_u16),
-
         (total_trig_rate, set_total_rate, store_u32, load_u32),
         (ch1p_trig_rate, set_ch1p_trig_rate, store_u32, load_u32),
         (ch2p_trig_rate, set_ch2p_trig_rate, store_u32, load_u32),
@@ -192,71 +187,94 @@ impl YamlIOable for msgcont::Slc<[u32;16]>{
     ];
 }
 
-impl YamlIOable for msgcont::RdIntReg<[u32;13]>{
+impl YamlIOable for msgcont::RdIntReg {
     yaml_io![
         (ip, set_ip, store_u32, load_u32),
         (board_mac, set_board_mac, store_u32, load_u32),
         (board_ip, set_board_ip, store_u32, load_u32),
         (dst_mac1, set_dst_mac1, store_u64, load_u64),
-        (dst_ip1,set_dst_ip1, store_u32, load_u32),
+        (dst_ip1, set_dst_ip1, store_u32, load_u32),
         (dst_mac2, set_dst_mac2, store_u64, load_u64),
-        (dst_ip2,set_dst_ip2, store_u32, load_u32),
+        (dst_ip2, set_dst_ip2, store_u32, load_u32),
         (port1, set_port1, store_u16, load_u16),
         (port2, set_port2, store_u16, load_u16),
         (serial, set_serial, store_u64, load_u64)
     ];
 }
 
-impl YamlIOable for msgcont::Ack<[u32;2]>{
+impl YamlIOable for msgcont::Ack {
     yaml_io![
         (ip, set_ip, store_u32, load_u32),
         (msg_ack, set_msg_ack, store_u16, load_u16)
     ];
 }
 
-
-
-impl YamlIOable for msg::TrendMsg{
-    fn from_yaml(cfg:&Value)->Self{
-        let msg_type=load_str(cfg, "msg_type").unwrap();
-        match msg_type.as_str(){
-            "DAQ"=>msg::TrendMsg::Daq{content:YamlIOable::from_yaml(cfg)},
-            "TRIG"=>msg::TrendMsg::Trig{content:YamlIOable::from_yaml(cfg)},
-            "SLCREQ"=>msg::TrendMsg::SlcReq,
-            "GPS"=>msg::TrendMsg::Gps{content:YamlIOable::from_yaml(cfg), payload:load_vec_u8(cfg, "data").unwrap()},
-            "ADC"=>msg::TrendMsg::Adc{content:YamlIOable::from_yaml(cfg)},
-            "INTREG"=>msg::TrendMsg::IntReg{content:YamlIOable::from_yaml(cfg)},
-            "DATA"=>msg::TrendMsg::Data{content:YamlIOable::from_yaml(cfg), payload:load_vec_u16(cfg, "data").unwrap()},
-            "SLC" => msg::TrendMsg::Slc{content:YamlIOable::from_yaml(cfg)},
-            "RDINTREG"=>msg::TrendMsg::RdIntReg{content:YamlIOable::from_yaml(cfg)},
-            "ACK"=>msg::TrendMsg::Ack{content:YamlIOable::from_yaml(cfg)},
-            _=>panic!()
+impl YamlIOable for msg::TrendMsg {
+    fn from_yaml(cfg: &Value) -> Self {
+        let msg_type = load_str(cfg, "msg_type").unwrap();
+        match msg_type.as_str() {
+            "DAQ" => msg::TrendMsg::Daq {
+                content: YamlIOable::from_yaml(cfg),
+            },
+            "TRIG" => msg::TrendMsg::Trig {
+                content: YamlIOable::from_yaml(cfg),
+            },
+            "SLCREQ" => msg::TrendMsg::SlcReq,
+            "GPS" => msg::TrendMsg::Gps {
+                content: YamlIOable::from_yaml(cfg),
+                payload: load_vec_u8(cfg, "data").unwrap(),
+            },
+            "ADC" => msg::TrendMsg::Adc {
+                content: YamlIOable::from_yaml(cfg),
+            },
+            "INTREG" => msg::TrendMsg::IntReg {
+                content: YamlIOable::from_yaml(cfg),
+            },
+            "DATA" => msg::TrendMsg::Data {
+                content: YamlIOable::from_yaml(cfg),
+                payload: load_vec_u16(cfg, "data").unwrap(),
+            },
+            "SLC" => msg::TrendMsg::Slc {
+                content: YamlIOable::from_yaml(cfg),
+            },
+            "RDINTREG" => msg::TrendMsg::RdIntReg {
+                content: YamlIOable::from_yaml(cfg),
+            },
+            "ACK" => msg::TrendMsg::Ack {
+                content: YamlIOable::from_yaml(cfg),
+            },
+            _ => panic!(),
         }
-    }   
+    }
 
-    fn to_yaml(&self)->Value{
-        let mut result=
-        match self{
-            &msg::TrendMsg::Daq{ref content}=>content.to_yaml(),
-            &msg::TrendMsg::Trig{ref content}=>content.to_yaml(),
-            &msg::TrendMsg::SlcReq{..}=>From::from(Mapping::new()),
-            &msg::TrendMsg::Gps{ref content,ref payload}=>{
-                let mut x=content.to_yaml();
-                x["data"]=From::<Vec<u16>>::from(payload.iter().map(|&x|{x as u16}).collect());
+    fn to_yaml(&self) -> Value {
+        let mut result = match self {
+            &msg::TrendMsg::Daq { ref content } => content.to_yaml(),
+            &msg::TrendMsg::Trig { ref content } => content.to_yaml(),
+            &msg::TrendMsg::SlcReq { .. } => From::from(Mapping::new()),
+            &msg::TrendMsg::Gps {
+                ref content,
+                ref payload,
+            } => {
+                let mut x = content.to_yaml();
+                x["data"] = From::<Vec<u16>>::from(payload.iter().map(|&x| x as u16).collect());
                 x
-            },
-            &msg::TrendMsg::Adc{ref content}=>content.to_yaml(),
-            &msg::TrendMsg::IntReg{ref content,..}=>content.to_yaml(),
-            &msg::TrendMsg::Data{ref content,ref payload}=>{
-                let mut x=content.to_yaml();
-                x["data"]=From::from(payload.clone());
+            }
+            &msg::TrendMsg::Adc { ref content } => content.to_yaml(),
+            &msg::TrendMsg::IntReg { ref content, .. } => content.to_yaml(),
+            &msg::TrendMsg::Data {
+                ref content,
+                ref payload,
+            } => {
+                let mut x = content.to_yaml();
+                x["data"] = From::from(payload.clone());
                 x
-            },
-            &msg::TrendMsg::Slc{ref content,..}=>content.to_yaml(),
-            &msg::TrendMsg::RdIntReg{ref content,..}=>content.to_yaml(),
-            &msg::TrendMsg::Ack{ref content,..}=>content.to_yaml(),
+            }
+            &msg::TrendMsg::Slc { ref content, .. } => content.to_yaml(),
+            &msg::TrendMsg::RdIntReg { ref content, .. } => content.to_yaml(),
+            &msg::TrendMsg::Ack { ref content, .. } => content.to_yaml(),
         };
-        result["name"]=From::from(self.type_name());
+        result["name"] = From::from(self.type_name());
         result
     }
 }
