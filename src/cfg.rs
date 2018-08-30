@@ -158,6 +158,7 @@ impl YamlIOable for msgcont::Data<[u32;5]>{
         (ts2, set_ts2, store_u32, load_u32),
         (ts1trigger, set_ts1trigger, store_u8, load_u8),
         (ts1pps, set_ts1pps, store_u8, load_u8),
+        (sss, set_sss, store_u16, load_u16),
         (event_count, set_event_count, store_u32, load_u32),
         (trig_pattern, set_trig_pattern, store_u8, load_u8)
     ];

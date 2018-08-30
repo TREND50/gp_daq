@@ -1,5 +1,11 @@
 //use bitfield::*;
-use std::convert::From;
+
+pub trait Decode
+where Self:Sized
+{
+    fn decode(&[u32])->Option<Self>;
+}
+
 
 bitfield!{
     #[repr(C)]
@@ -20,13 +26,18 @@ bitfield!{
     pub u8, att2, set_att2:32+13,32+7;//7
 }
 
-impl<'a> From<&'a [u32]> for Daq<[u32;2]>{
-    fn from(data:&'a [u32])->Self{
+impl Decode for Daq<[u32;2]>{
+    fn decode(data:&[u32])->Option<Self>{
         let mut result=[0_u32;2];
-        result.copy_from_slice(&data[..2]);
-        Daq(result)
+        if data.len()<2{
+            None
+        }else {
+            result.copy_from_slice(&data[..2]);
+            Some(Daq(result))
+        }
     }
 }
+
 
 
 
@@ -54,14 +65,14 @@ bitfield!{
     pub u16,th3p, set_th3p:96+23, 96+12;
 }
 
-impl<'a> From<&'a [u32]> for Trig<[u32;4]>{
-    fn from(data:&'a [u32])->Self{
+impl Decode for Trig<[u32;4]>{
+    fn decode(data:&[u32])->Option<Self>{
         let mut result=[0_u32;4];
         match data[0]&0x80_00_00{
-            1 => result[0]=data[0],
-            _ => result.copy_from_slice(&data[..4]),
-        }
-        Trig(result)
+            1 => if data.len()<1{None}else{result[0]=data[0]; Some(result)},
+            _ => if data.len()<4{None}else{result.copy_from_slice(&data[..4]);
+                Some(result)}
+        }.map(|x|{Trig(x)})
     }
 }
 
@@ -77,11 +88,15 @@ bitfield!{
     pub u8, wrd, set_wrd:13,8;//6
 }
 
-impl<'a> From<&'a [u32]> for Gps<[u32;1]>{
-    fn from(data:&'a [u32])->Self{
+impl Decode for Gps<[u32;1]>{
+    fn decode(data:&[u32])->Option<Self>{
         let mut result=[0_u32;1];
-        result.copy_from_slice(&data[..1]);
-        Gps(result)
+        if data.len()<1{
+            None
+        }else{
+            result.copy_from_slice(&data[..1]);
+            Some(Gps(result))
+        }
     }
 }
 
@@ -95,11 +110,15 @@ bitfield!{
     pub u16, data, set_data: 15,0;//16
 }
 
-impl<'a> From<&'a [u32]> for Adc<[u32;1]>{
-    fn from(data:&'a [u32])->Self{
+impl Decode for Adc<[u32;1]>{
+    fn decode(data:&[u32])->Option<Self>{
         let mut result=[0_u32;1];
-        result.copy_from_slice(&data[..1]);
-        Adc(result)
+        if data.len()<1{
+            None
+        }else{
+            result.copy_from_slice(&data[..1]);
+            Some(Adc(result))
+        }
     }
 }
 
@@ -126,14 +145,20 @@ bitfield!{
     pub u16, port2, set_port2:320+15,320+0;
 }
 
-impl<'a> From<&'a [u32]> for IntReg<[u32;11]>{
-    fn from(data:&'a [u32])->Self{
+impl Decode for IntReg<[u32;11]>{
+    fn decode(data:&[u32])->Option<Self>{
         let mut result=[0_u32;11];
-        match data[0]&1{
-            1 => result.copy_from_slice(&data[..11]),
-            _ => ()
+        if data.len()<1{
+            None
         }
-        IntReg(result)
+        else {
+            match data[0] & 1 {
+                1 => if data.len()<11{None} else{
+                    result.copy_from_slice(&data[..11]);
+                    Some(result)},
+                _ => Some(result)
+            }
+        }.map(|x|{IntReg(x)})
     }
 }
 
@@ -148,15 +173,21 @@ bitfield!{
     pub u32,ts2, set_ts2:32+31, 32+0;
     pub u8, ts1trigger, set_ts1trigger:64+7,64+0;
     pub u8, ts1pps, set_ts1pps:64+15, 64+8;
+    pub u16, sss, set_sss: 64+31,64+16;
     pub u32,event_count, set_event_count:96+31,96+0;
     pub u8, trig_pattern, set_trig_pattern:128+5, 128+0;
 }
 
-impl<'a> From<&'a [u32]> for Data<[u32;5]>{
-    fn from(data:&'a [u32])->Self{
+impl Decode for Data<[u32;5]>{
+    fn decode(data:&[u32])->Option<Self>{
         let mut result=[0_u32;5];
-        result.copy_from_slice(&data[..4]);
-        Data(result)
+        if data.len()<5{
+            None
+        }
+        else{
+            result.copy_from_slice(&data[..5]);
+            Some(Data(result))
+        }
     }
 }
 
@@ -196,11 +227,16 @@ bitfield!{
     pub max_coarse, set_max_coarse:480+31, 480+0;
 }
 
-impl<'a> From<&'a [u32]> for Slc<[u32;16]>{
-    fn from(data:&'a [u32])->Self{
+impl Decode for Slc<[u32;16]>{
+    fn decode(data:&[u32])->Option<Self>{
         let mut result=[0_u32;16];
-        result.copy_from_slice(&data[..16]);
-        Slc(result)
+        if data.len()<16{
+            None
+        }
+        else{
+            result.copy_from_slice(&data[..16]);
+            Some(Slc(result))
+        }
     }
 }
 
@@ -227,11 +263,16 @@ bitfield!{
     pub u64, serial, set_serial:352+63, 352+0;
 }
 
-impl<'a> From<&'a [u32]> for RdIntReg<[u32;13]>{
-    fn from(data:&'a [u32])->Self{
+impl Decode for RdIntReg<[u32;13]>{
+    fn decode(data:&[u32])->Option<Self>{
         let mut result=[0_u32;13];
-        result.copy_from_slice(&data[..13]);
-        RdIntReg(result)
+        if data.len()<13{
+            None
+        }
+        else{
+            result.copy_from_slice(&data[..13]);
+            Some(RdIntReg(result))
+        }
     }
 }
 
@@ -246,10 +287,15 @@ bitfield!{
     pub u16, msg_ack, set_msg_ack:32+15, 32+0;
 }
 
-impl<'a> From<&'a [u32]> for Ack<[u32;2]>{
-    fn from(data:&'a [u32])->Self{
+impl Decode for Ack<[u32;2]>{
+    fn decode(data:&[u32])->Option<Self>{
         let mut result=[0_u32;2];
-        result.copy_from_slice(&data[..2]);
-        Ack(result)
+        if data.len()<2{
+            None
+        }
+        else{
+            result.copy_from_slice(&data[..2]);
+            Some(Ack(result))
+        }
     }
 }

@@ -1,5 +1,5 @@
 [package]
-name = "grandproto_rs"
+name = "gp_daq"
 version = "0.1.0"
 authors = ["Gu Junhua <jhgu@nao.cas.cn>"]
 

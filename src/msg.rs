@@ -1,5 +1,6 @@
-use msgcont::{self};
+use msgcont::{self, Decode};
 
+#[derive(Debug)]
 pub enum TrendMsg{
     Daq{content:msgcont::Daq<[u32;2]>},
     Trig{content:msgcont::Trig<[u32;4]>},
@@ -123,35 +124,60 @@ impl TrendMsg{
         result
     }
 
-    pub fn from_word_vec(data:Vec<u32>)->TrendMsg{
+    pub fn from_word_vec(data:Vec<u32>)->Option<TrendMsg>{
         assert!(data[0]==Self::header());
         assert!(data[data.len()-1]==Self::tailer());
         match data[1]{
-            0x5000 => TrendMsg::Daq{content:msgcont::Daq::<[u32;2]>::from(&data[2..])},
-            0x5100 => TrendMsg::Trig{content:msgcont::Trig::<[u32;4]>::from(&data[2..])},
-            0x5200 => TrendMsg::SlcReq,
+            0x5000 => msgcont::Daq::<[u32;2]>::decode(&data[2..]).map(|x| TrendMsg::Daq{content:x}),
+            0x5100 => msgcont::Trig::<[u32;4]>::decode(&data[2..]).map(|x| TrendMsg::Trig{content:x}),
+            0x5200 => Some(TrendMsg::SlcReq),
             0x5300 => {
-                let mut payload=Vec::with_capacity((data.len()-3)*2);
-                for d in &data[3..]{
-                    payload.push((*d&0xff) as u8);
-                    payload.push(((*d>>8)&0xff) as u8);
+                if data.len()<4{
+                    None
                 }
-                TrendMsg::Gps{content:msgcont::Gps::<[u32;1]>::from(&data[2..]), payload:payload}
+                else{
+                    let mut payload=Vec::with_capacity((data.len()-4)*2);
+                    for d in &data[3..data.len()-1]{
+                        payload.push((*d&0xff) as u8);
+                        payload.push(((*d>>8)&0xff) as u8);
+                    }
+                    msgcont::Gps::<[u32;1]>::decode(&data[2..]).map(|x| TrendMsg::Gps{content:x, payload:payload})
+                }
             }
-            0x5400 => TrendMsg::Adc{content:msgcont::Adc::<[u32;1]>::from(&data[2..])},
-            0x5E00 => TrendMsg::IntReg{content:msgcont::IntReg::<[u32;11]>::from(&data[2..])},
+            0x5400 => msgcont::Adc::<[u32;1]>::decode(&data[2..]).map(|x|TrendMsg::Adc{content:x}),
+            0x5E00 => msgcont::IntReg::<[u32;11]>::decode(&data[2..]).map(|x|TrendMsg::IntReg{content:x}),
             0x5A00 => {
-                let mut payload=Vec::with_capacity((data.len()-7)*2);
-                for d in &data[7..]{
-                    payload.push((*d&0xfff) as u16);
-                    payload.push(((*d>>12)&0xfff) as u16);
+                if data.len()<8{
+                    None
                 }
-                TrendMsg::Data{content:msgcont::Data::<[u32;5]>::from(&data[2..]), payload:payload}
+                else{
+                    let mut payload=Vec::with_capacity((data.len()-8)*2);
+                    for d in &data[7..data.len()-1]{
+                        payload.push((*d&0xfff) as u16);
+                        payload.push(((*d>>12)&0xfff) as u16);
+                    }
+                    msgcont::Data::<[u32;5]>::decode(&data[2..]).map(|x|TrendMsg::Data{content:x, payload:payload})
+                }
             }
-            0x5B00 => TrendMsg::Slc{content:msgcont::Slc::<[u32;16]>::from(&data[2..])},
-            0x5C00 => TrendMsg::RdIntReg{content:msgcont::RdIntReg::<[u32;13]>::from(&data[2..])},
-            0x5D00 => TrendMsg::Ack{content:msgcont::Ack::<[u32;2]>::from(&data[2..])},
-            _=>panic!()
+            0x5B00 => msgcont::Slc::<[u32;16]>::decode(&data[2..]).map(|x|TrendMsg::Slc{content:x}),
+            0x5C00 => msgcont::RdIntReg::<[u32;13]>::decode(&data[2..]).map(|x|TrendMsg::RdIntReg{content:x}),
+            0x5D00 => msgcont::Ack::<[u32;2]>::decode(&data[2..]).map(|x|TrendMsg::Ack{content:x}),
+            _=>None
         }
+    }
+
+    pub fn to_byte_vec(&self)->Vec<u8>{
+        let word_slice=self.to_word_vec().into_boxed_slice();
+        let cap=word_slice.len()*4;
+        unsafe{Vec::from_raw_parts(Box::into_raw(word_slice) as *mut u8, cap, cap)}
+    }
+
+    pub fn from_byte_vec(data:Vec<u8>)->Option<TrendMsg>{
+        let word_cap=data.len()/4;
+        assert!(word_cap*4==data.len());
+        Self::from_word_vec(
+            unsafe{
+                Vec::from_raw_parts(Box::into_raw(data.into_boxed_slice()) as *mut u32, word_cap, word_cap)
+                })
     }
 }
