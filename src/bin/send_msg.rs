@@ -1,14 +1,14 @@
 extern crate gp_daq;
 extern crate serde_yaml;
 use gp_daq::cfg::YamlIOable;
-use gp_daq::msgcont::Daq;
-use serde_yaml::{from_reader, to_writer, Value};
-use std::convert::From;
+//use gp_daq::msgcont::Daq;
+use serde_yaml::{from_reader, Value};
+
 use std::fs::File;
-use std::io::Read;
+
 use std::env;
 
-use std::net::{SocketAddr, ToSocketAddrs, UdpSocket};
+use std::net::{UdpSocket};
 
 fn main() {
 
@@ -19,5 +19,5 @@ fn main() {
 
     let data = daq1.to_byte_vec();
     let socket = UdpSocket::bind("0.0.0.0:0").unwrap();
-    socket.send_to(&data[..], addr);
+    let _=socket.send_to(&data[..], addr);
 }

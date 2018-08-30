@@ -6,3 +6,6 @@ authors = ["Gu Junhua <jhgu@nao.cas.cn>"]
 [dependencies]
 bitfield = "0.13.0"
 serde_yaml = "0.8.1"
+bincode = "1.0.1"
+serde_derive = "1.0.75"
+serde = "1.0.75"
