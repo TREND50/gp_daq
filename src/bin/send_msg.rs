@@ -6,15 +6,18 @@ use serde_yaml::{from_reader, to_writer, Value};
 use std::convert::From;
 use std::fs::File;
 use std::io::Read;
+use std::env;
 
 use std::net::{SocketAddr, ToSocketAddrs, UdpSocket};
 
 fn main() {
-    let mut f = File::open("a.yaml").unwrap();
+
+    let mut f = File::open(env::args().nth(1).unwrap()).unwrap();
+    let addr=env::args().nth(2).unwrap();
     let v: Value = from_reader(&mut f).unwrap();
     let daq1 = gp_daq::msg::TrendMsg::from_yaml(&v);
 
     let data = daq1.to_byte_vec();
     let socket = UdpSocket::bind("0.0.0.0:0").unwrap();
-    socket.send_to(&data[..], "10.11.0.36:1234");
+    socket.send_to(&data[..], addr);
 }

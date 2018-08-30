@@ -6,3 +6,4 @@ authors = ["Gu Junhua <jhgu@nao.cas.cn>"]
 [dependencies]
 bitfield = "0.13.0"
 serde_yaml = "0.8.1"
+tokio = "0.1.8"
