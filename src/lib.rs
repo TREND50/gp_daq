@@ -4,9 +4,8 @@
 extern crate bitfield;
 extern crate serde_yaml;
 
-
 pub mod cfg;
+pub mod event_file;
 pub mod msg;
 pub mod msgcont;
 pub mod server;
-pub mod event_file;

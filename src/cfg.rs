@@ -32,52 +32,51 @@ pub fn load_str(data: &Value, k: &str) -> Option<String> {
     data[k].as_str().map(|ref x| x.to_string())
 }
 
-pub fn str2u64(s:&str)->Option<u64>{
-    let r= if s.len()<=2 {
-        let a=u64::from_str_radix(s, 10);
+pub fn str2u64(s: &str) -> Option<u64> {
+    let r = if s.len() <= 2 {
+        let a = u64::from_str_radix(s, 10);
         a
-    }
-    else if &s[0..2]=="0b" || &s[0..2]=="0B"{
-        u64::from_str_radix(&s[2..],2)
-    }else if &s[0..2]=="0x"||&s[0..2]=="0X"{
-        u64::from_str_radix(&s[2..],16)
-    }else{
+    } else if &s[0..2] == "0b" || &s[0..2] == "0B" {
+        u64::from_str_radix(&s[2..], 2)
+    } else if &s[0..2] == "0x" || &s[0..2] == "0X" {
+        u64::from_str_radix(&s[2..], 16)
+    } else {
         return None;
     };
     match r {
         Ok(x) => Some(x),
-        _=>None
+        _ => None,
     }
 }
 
 pub fn load_u64(data: &Value, k: &str) -> Option<u64> {
-    if let Some(s)=data[k].as_str(){
+    if let Some(s) = data[k].as_str() {
         str2u64(s)
-    }else{
+    } else {
         data[k].as_u64()
     }
 }
 
 pub fn load_u32(data: &Value, k: &str) -> Option<u32> {
-    if let Some(s)=data[k].as_str(){
+    if let Some(s) = data[k].as_str() {
         str2u64(s).map(|x| x as u32)
-    }else{
+    } else {
         data[k].as_u64().map(|x| x as u32)
     }
 }
 
 pub fn load_u16(data: &Value, k: &str) -> Option<u16> {
-    if let Some(s)=data[k].as_str(){
+    if let Some(s) = data[k].as_str() {
         str2u64(s).map(|x| x as u16)
-    }else{
+    } else {
         data[k].as_u64().map(|x| x as u16)
     }
 }
 
 pub fn load_u8(data: &Value, k: &str) -> Option<u8> {
-    if let Some(s)=data[k].as_str(){
+    if let Some(s) = data[k].as_str() {
         str2u64(s).map(|x| x as u8)
-    }else{
+    } else {
         data[k].as_u64().map(|x| x as u8)
     }
 }
@@ -165,8 +164,9 @@ impl YamlIOable for msgcont::Gps {
 }
 
 impl YamlIOable for msgcont::Adc {
-    yaml_io![(reg_func, set_reg_func, store_u16, load_u16),
-            (addr, set_addr, store_u8, load_u8)
+    yaml_io![
+        (reg_func, set_reg_func, store_u16, load_u16),
+        (addr, set_addr, store_u8, load_u8)
     ];
 }
 
@@ -258,9 +258,13 @@ impl YamlIOable for msg::TrendMsg {
             "SLCREQ" => msg::TrendMsg::SlcReq,
             "GPS" => msg::TrendMsg::Gps {
                 content: YamlIOable::from_yaml(cfg),
-                payload: load_vec_u8(cfg, "data").map_or_else(||{
-                    eprintln!("Warning: payload not found, use []");
-                    vec![]},|x|{x}),
+                payload: load_vec_u8(cfg, "data").map_or_else(
+                    || {
+                        eprintln!("Warning: payload not found, use []");
+                        vec![]
+                    },
+                    |x| x,
+                ),
             },
             "ADC" => msg::TrendMsg::Adc {
                 content: YamlIOable::from_yaml(cfg),
@@ -270,10 +274,13 @@ impl YamlIOable for msg::TrendMsg {
             },
             "DATA" => msg::TrendMsg::Data {
                 content: YamlIOable::from_yaml(cfg),
-                payload: load_vec_u16(cfg, "data").map_or_else(||{
-                    eprintln!("Warning: payload not found, use []");
-                    vec![]
-                }, |x|{x}),
+                payload: load_vec_u16(cfg, "data").map_or_else(
+                    || {
+                        eprintln!("Warning: payload not found, use []");
+                        vec![]
+                    },
+                    |x| x,
+                ),
             },
             "SLC" => msg::TrendMsg::Slc {
                 content: YamlIOable::from_yaml(cfg),
