@@ -4,5 +4,5 @@ version = "0.1.0"
 authors = ["Gu Junhua <jhgu@nao.cas.cn>"]
 
 [dependencies]
-bitfield = "0.13.0"
-serde_yaml = "0.8.1"
+bitfield = ">=0.13"
+serde_yaml = ">=0.8"
