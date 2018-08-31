@@ -83,7 +83,7 @@ impl TrendMsg {
             &TrendMsg::SlcReq { .. } => None,
             &TrendMsg::Gps { ref content, .. } => Some(&content.0),
             &TrendMsg::Adc { ref content, .. } => Some(&content.0),
-            &TrendMsg::IntReg { ref content, .. } => match content.y() {
+            &TrendMsg::IntReg { ref content, .. } => match content.write() {
                 0 => Some(&content.0[0..1]),
                 _ => Some(&content.0),
             },

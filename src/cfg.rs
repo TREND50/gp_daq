@@ -32,20 +32,54 @@ pub fn load_str(data: &Value, k: &str) -> Option<String> {
     data[k].as_str().map(|ref x| x.to_string())
 }
 
+pub fn str2u64(s:&str)->Option<u64>{
+    let r= if s.len()<=2 {
+        let a=u64::from_str_radix(s, 10);
+        a
+    }
+    else if &s[0..2]=="0b" || &s[0..2]=="0B"{
+        u64::from_str_radix(&s[2..],2)
+    }else if &s[0..2]=="0x"||&s[0..2]=="0X"{
+        u64::from_str_radix(&s[2..],16)
+    }else{
+        return None;
+    };
+    match r {
+        Ok(x) => Some(x),
+        _=>None
+    }
+}
+
 pub fn load_u64(data: &Value, k: &str) -> Option<u64> {
-    data[k].as_u64()
+    if let Some(s)=data[k].as_str(){
+        str2u64(s)
+    }else{
+        data[k].as_u64()
+    }
 }
 
 pub fn load_u32(data: &Value, k: &str) -> Option<u32> {
-    data[k].as_u64().map(|x| x as u32)
+    if let Some(s)=data[k].as_str(){
+        str2u64(s).map(|x| x as u32)
+    }else{
+        data[k].as_u64().map(|x| x as u32)
+    }
 }
 
 pub fn load_u16(data: &Value, k: &str) -> Option<u16> {
-    data[k].as_u64().map(|x| x as u16)
+    if let Some(s)=data[k].as_str(){
+        str2u64(s).map(|x| x as u16)
+    }else{
+        data[k].as_u64().map(|x| x as u16)
+    }
 }
 
 pub fn load_u8(data: &Value, k: &str) -> Option<u8> {
-    data[k].as_u64().map(|x| x as u8)
+    if let Some(s)=data[k].as_str(){
+        str2u64(s).map(|x| x as u8)
+    }else{
+        data[k].as_u64().map(|x| x as u8)
+    }
 }
 
 pub fn store_u64(data: &mut Value, k: &str, v: u64) {
@@ -138,7 +172,7 @@ impl YamlIOable for msgcont::Adc {
 
 impl YamlIOable for msgcont::IntReg {
     yaml_io![
-        (y, set_y, store_u8, load_u8),
+        (write, set_write, store_u8, load_u8),
         (board_mac, set_board_mac, store_u32, load_u32),
         (board_ip, set_board_ip, store_u32, load_u32),
         (dst_mac1, set_dst_mac1, store_u64, load_u64),

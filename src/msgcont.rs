@@ -143,7 +143,7 @@ bitfield!{
     pub struct IntReg_([u32]);
     impl Debug;
     u32;
-    pub u8, y,set_y:0,0;
+    pub u8, write,set_write:0,0;
 
     pub u32,board_mac, set_board_mac: 32+31,32+0;
     pub u32,board_ip, set_board_ip:64+31, 64+0;

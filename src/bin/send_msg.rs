@@ -22,11 +22,11 @@ fn main() {
     let msg_str=str::from_utf8(&bytes).unwrap().to_string();
 
     for s in msg_str.split("---"){
-        from_str::<Value>(s).map(|v|{
-            println!("{:?}", v);
+        let _=from_str::<Value>(s).map(|v|{
+            //println!("{:?}", v);
             let daq1 = gp_daq::msg::TrendMsg::from_yaml(&v);
-
             let data = daq1.to_byte_vec();
+            println!("sending msg with size {}",data.len());
             let socket = UdpSocket::bind("0.0.0.0:0").unwrap();
             let _=socket.send_to(&data[..], addr.clone());
         });
