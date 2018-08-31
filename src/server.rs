@@ -20,7 +20,7 @@ impl TrendServer{
             let (s, addr)=self.socket.recv_from(&mut buf[..]).unwrap();
             assert!(s<=buf.len());
             unsafe{buf.set_len(s)};
-            println!("{}", buf.len());
+            //println!("{}", buf.len());
 
             match TrendMsg::from_byte_vec(buf){
                 Some(ref msg)=>{
