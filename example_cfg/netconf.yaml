@@ -1,0 +1,5 @@
+msg_type: INTREG
+write: 1
+board_mac: 0x11223344
+board_ip: 0x01020304
+dst_mac1: 0x11223344
