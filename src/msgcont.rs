@@ -24,12 +24,12 @@ bitfield!{
     impl Debug;
     u32;
     pub u8, daq_on, set_daq_on: 0, 0;//1
-    pub u8, cal_on, set_cal_on: 3, 1;//3
+    pub u8, ant_on, set_ant_on: 3, 1;//3
     pub u8, rd_wr_plus, set_rd_wr_plus:4,4;//1
     pub u8, en_osc, set_en_osc:5,5;//1
     pub u8, cntrl_adc, set_cntrl_adc:7,6; //2
     pub u16,offst, set_offst:19,8; //12
-    pub u8, dis_pd, set_dis_pd:22,20; //3
+    pub u8, enable_pd, set_enable_pd:22,20; //3
     pub u8, dis_lna, set_dis_lna:25,23;//3
     pub u8, le, set_le:31, 26; //6
     pub u8, att1, set_att1:32+6, 32+0; //7
@@ -121,7 +121,8 @@ bitfield!{
     pub struct Adc_([u32]);
     impl Debug;
     u16;
-    pub u16, data, set_data: 15,0;//16
+    pub u16, reg_func, set_reg_func: 10,0;//16
+    pub u8,  addr, set_addr: 15,11;
 }
 
 impl Decode for Adc {

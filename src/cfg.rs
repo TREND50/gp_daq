@@ -95,12 +95,12 @@ pub trait YamlIOable {
 impl YamlIOable for msgcont::Daq {
     yaml_io![
         (daq_on, set_daq_on, store_u8, load_u8),
-        (cal_on, set_cal_on, store_u8, load_u8),
+        (ant_on, set_ant_on, store_u8, load_u8),
         (rd_wr_plus, set_rd_wr_plus, store_u8, load_u8),
         (en_osc, set_en_osc, store_u8, load_u8),
         (cntrl_adc, set_cntrl_adc, store_u8, load_u8),
         (offst, set_offst, store_u16, load_u16),
-        (dis_pd, set_dis_pd, store_u8, load_u8),
+        (enable_pd, set_enable_pd, store_u8, load_u8),
         (dis_lna, set_dis_lna, store_u8, load_u8),
         (le, set_le, store_u8, load_u8),
         (att1, set_att1, store_u8, load_u8),
@@ -131,7 +131,9 @@ impl YamlIOable for msgcont::Gps {
 }
 
 impl YamlIOable for msgcont::Adc {
-    yaml_io![(data, set_data, store_u16, load_u16)];
+    yaml_io![(reg_func, set_reg_func, store_u16, load_u16),
+            (addr, set_addr, store_u8, load_u8)
+    ];
 }
 
 impl YamlIOable for msgcont::IntReg {
@@ -222,7 +224,9 @@ impl YamlIOable for msg::TrendMsg {
             "SLCREQ" => msg::TrendMsg::SlcReq,
             "GPS" => msg::TrendMsg::Gps {
                 content: YamlIOable::from_yaml(cfg),
-                payload: load_vec_u8(cfg, "data").unwrap(),
+                payload: load_vec_u8(cfg, "data").map_or_else(||{
+                    eprintln!("Warning: payload not found, use []");
+                    vec![]},|x|{x}),
             },
             "ADC" => msg::TrendMsg::Adc {
                 content: YamlIOable::from_yaml(cfg),
@@ -232,7 +236,10 @@ impl YamlIOable for msg::TrendMsg {
             },
             "DATA" => msg::TrendMsg::Data {
                 content: YamlIOable::from_yaml(cfg),
-                payload: load_vec_u16(cfg, "data").unwrap(),
+                payload: load_vec_u16(cfg, "data").map_or_else(||{
+                    eprintln!("Warning: payload not found, use []");
+                    vec![]
+                }, |x|{x}),
             },
             "SLC" => msg::TrendMsg::Slc {
                 content: YamlIOable::from_yaml(cfg),
@@ -274,7 +281,7 @@ impl YamlIOable for msg::TrendMsg {
             &msg::TrendMsg::RdIntReg { ref content, .. } => content.to_yaml(),
             &msg::TrendMsg::Ack { ref content, .. } => content.to_yaml(),
         };
-        result["name"] = From::from(self.type_name());
+        result["msg_type"] = From::from(self.type_name());
         result
     }
 }
