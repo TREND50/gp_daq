@@ -194,7 +194,7 @@ impl TrendMsg {
 
     pub fn from_byte_vec(data: Vec<u8>) -> Option<TrendMsg> {
         let word_cap = data.len() / 4;
-        if (word_cap * 4 != data.len()) {
+        if word_cap * 4 != data.len() {
             return None;
         }
         Self::from_word_vec(unsafe {

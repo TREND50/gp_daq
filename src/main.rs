@@ -1,25 +1,31 @@
 extern crate gp_daq;
-extern crate serde_yaml;
 
+//use std::env;
 
-
-use std::env;
-
-use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::fs::File;
-use std::io::Read;
-use gp_daq::msg::TrendMsg;
-use gp_daq::msgcont::Daq;
-use serde_yaml::{from_reader, to_writer, Value};
-use std::convert::From;
-use gp_daq::cfg::*;
-use gp_daq::server::TrendServer;
-
+use gp_daq::event_file::*;
 
 fn main() {
-    let addr = env::args().nth(1).unwrap_or("0.0.0.0:1234".to_string());
-    let addr = addr.parse::<SocketAddr>().unwrap();
-    let mut server=TrendServer::new(addr);
-    server.register_handler(Box::new(move |msg,_|{println!("{:?}", msg);}));
-    server.run();
+    let fh=FileHeader::new().with_additional_header(vec![0,1,2]);
+    let mut file=File::create("a.bin").unwrap();
+    fh.write_to(&mut file);
+    println!("{:?}", fh);
+    let mut file=File::open("a.bin").unwrap();
+    let fh1=FileHeader::read_from(&mut file).unwrap();
+    println!("{:?}", fh1);
+    println!("{}", std::mem::size_of_val(&fh.basic_header));
+
+    let mut event=Event::new(EventHeader::default());
+    let lsh=LocalStationHeader::default();
+    let ls=LocalStation::new(lsh, vec![0,1],vec![0,1,2,3,4]);
+    event.push_local_station(ls);
+    println!("{:?}", event);
+
+    let event_file=EventFile{header:fh, event_list:vec![event]};
+    println!("{:?}", event_file);
+    let mut file2=File::create("b.bin").unwrap();
+    event_file.write_to(&mut file2);
+    let mut file2=File::open("b.bin").unwrap();
+    let ef=EventFile::read_from(&mut file2).unwrap();
+    println!("{:?}", ef);
 }

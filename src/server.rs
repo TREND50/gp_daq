@@ -4,7 +4,6 @@ use super::msg::TrendMsg;
 use std;
 use std::net::{SocketAddr, UdpSocket};
 
-
 pub struct TrendServer{
     socket:UdpSocket,
     handlers:Vec<Box<FnMut(&TrendMsg, std::net::SocketAddr)->()>>
@@ -41,4 +40,3 @@ impl TrendServer{
         }
     }
 }
-
