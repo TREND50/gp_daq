@@ -247,7 +247,7 @@ impl YamlIOable for msgcont::Ack {
 
 impl YamlIOable for msg::TrendMsg {
     fn from_yaml(cfg: &Value) -> Self {
-        let msg_type = load_str(cfg, "msg_type").unwrap();
+        let msg_type = load_str(cfg, "msg_type").expect("missing msg_type key");
         match msg_type.as_str() {
             "DAQ" => msg::TrendMsg::Daq {
                 content: YamlIOable::from_yaml(cfg),

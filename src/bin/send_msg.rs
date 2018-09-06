@@ -1,3 +1,5 @@
+#![allow(unused_imports)]
+
 extern crate gp_daq;
 extern crate serde_yaml;
 use std::io::Read;
@@ -13,7 +15,6 @@ use std::net::UdpSocket;
 
 use gp_daq::io::cfg::YamlIOable;
 
-
 fn main() {
     let args: Vec<_> = env::args().collect();
 
@@ -22,7 +23,10 @@ fn main() {
         return;
     }
 
-    let mut f = File::open(env::args().nth(1).unwrap()).expect("Cannot open file");
+    let mut f = File::open(env::args().nth(1).expect(&format!(
+        "Usage: {} <cfg> <addr:port>",
+        env::args().nth(0).unwrap()
+    ))).expect("Cannot open file");
     let addr = env::args().nth(2).expect("Invalid addr");
 
     let mut bytes = Vec::new();

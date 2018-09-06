@@ -1,10 +1,11 @@
+#![allow(unused_imports)]
+
 extern crate gp_daq;
 extern crate serde_yaml;
 
 use std::env;
 use std::fs::{File, OpenOptions};
 use std::io::Write;
-
 
 use gp_daq::io::cfg::YamlIOable;
 use gp_daq::io::event_file::{Event, FileHeader};
@@ -18,7 +19,7 @@ fn main() {
         return;
     }
 
-    let mut server = TrendServer::new(args[1].parse().unwrap());
+    let mut server = TrendServer::new(args[1].parse().expect("invalid port"));
     server.register_handler(Box::new(|a, b| {
         println!("recv from {:?}", b);
         println!("msg:\n{:?}", a);
@@ -30,13 +31,13 @@ fn main() {
             .create(true)
             .append(true)
             .open(file_prefix + ".yaml")
-            .unwrap();
+            .expect("cannot open file");
         let file_prefix = args[2].clone();
         let mut bin_file = File::create(file_prefix + ".bin").unwrap();
         let fh = FileHeader::new();
         fh.write_to(&mut bin_file);
 
-        server.register_handler(Box::new(move |a, b| {
+        server.register_handler(Box::new(move |a, _b| {
             match a {
                 &TrendMsg::Data {
                     ref content,
@@ -48,7 +49,7 @@ fn main() {
                 _ => (),
             }
             let v = a.to_yaml();
-            serde_yaml::to_writer(&mut txt_file, &v);
+            serde_yaml::to_writer(&mut txt_file, &v).expect("write failed");
             write!(txt_file, "\n");
         }));
     }

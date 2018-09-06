@@ -3,7 +3,7 @@ use std::io::{Read, Write};
 
 use super::super::msg_def::msgcont::Data;
 
-pub trait FromByteStream: Default + Sized {
+trait FromByteStream: Default + Sized {
     fn read_from<R: Read>(reader: &mut R) -> Option<Self> {
         let size = std::mem::size_of::<Self>();
         let mut result = Self::default();
@@ -20,7 +20,7 @@ pub trait FromByteStream: Default + Sized {
     }
 }
 
-pub trait ToByteStream: Default + Sized {
+trait ToByteStream: Default + Sized {
     fn write_to<W: Write>(&self, writer: &mut W) {
         let size = std::mem::size_of::<Self>();
         let raw = unsafe { std::slice::from_raw_parts(self as *const Self as *const u8, size) };
@@ -28,14 +28,14 @@ pub trait ToByteStream: Default + Sized {
     }
 }
 
-pub fn write_vec_to<T: Sized, W: Write>(data: &Vec<T>, writer: &mut W) {
+fn write_vec_to<T: Sized, W: Write>(data: &Vec<T>, writer: &mut W) {
     let t_size = std::mem::size_of::<T>();
     let len = data.len();
     let raw = unsafe { std::slice::from_raw_parts(data.as_ptr() as *const u8, t_size * len) };
     let _ = writer.write(raw).unwrap();
 }
 
-pub fn read_vec_from<T: Sized + Default + Clone, R: Read>(
+fn read_vec_from<T: Sized + Default + Clone, R: Read>(
     reader: &mut R,
     len: usize,
 ) -> Option<Vec<T>> {

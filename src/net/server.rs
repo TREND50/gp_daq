@@ -34,7 +34,7 @@ impl TrendServer {
 
     pub fn new(addr: SocketAddr) -> Self {
         TrendServer {
-            socket: UdpSocket::bind(&addr).unwrap(),
+            socket: UdpSocket::bind(&addr).expect(&format!("bind to addr {} failed", addr)),
             handlers: Vec::new(),
         }
     }

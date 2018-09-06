@@ -1,4 +1,4 @@
 pub mod msg;
-pub mod msgcont;
+pub(crate) mod msgcont;
 
 pub use self::msg::*;
