@@ -4,9 +4,9 @@ extern crate tokio;
 use tokio::codec::Decoder;
 use tokio::net::{UdpSocket,UdpFramed};
 use std::net::{SocketAddr, Ipv4Addr, IpAddr};
-use gp_daq::codec::MsgDecoder;
 use tokio::prelude::Stream;
 use tokio::prelude::Future;
+use gp_daq::net::codec::MsgDecoder;
 
 fn main() {
     let addr=SocketAddr::new(Ipv4Addr::new(0,0,0,0).into(),1234);

@@ -1,4 +1,4 @@
-use super::msg::TrendMsg;
+use super::super::msg_def::msg::TrendMsg;
 
 use std;
 use std::net::{SocketAddr, UdpSocket};

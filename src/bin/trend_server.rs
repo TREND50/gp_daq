@@ -1,13 +1,15 @@
 extern crate gp_daq;
 extern crate serde_yaml;
 
-use gp_daq::cfg::YamlIOable;
-use gp_daq::event_file::{Event, FileHeader};
-use gp_daq::msg::TrendMsg;
-use gp_daq::server::TrendServer;
 use std::env;
 use std::fs::{File, OpenOptions};
 use std::io::Write;
+
+
+use gp_daq::io::cfg::YamlIOable;
+use gp_daq::io::event_file::{Event, FileHeader};
+use gp_daq::msg_def::TrendMsg;
+use gp_daq::net::server::TrendServer;
 
 fn main() {
     let args: Vec<_> = std::env::args().into_iter().collect();

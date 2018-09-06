@@ -1,5 +1,5 @@
 use tokio::codec::Decoder;
-use super::msg::TrendMsg;
+use super::super::msg_def::msg::TrendMsg;
 use bytes::BytesMut;
 
 use std;

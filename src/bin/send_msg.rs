@@ -1,6 +1,5 @@
 extern crate gp_daq;
 extern crate serde_yaml;
-use gp_daq::cfg::YamlIOable;
 use std::io::Read;
 use std::str;
 //use gp_daq::msgcont::Daq;
@@ -11,6 +10,9 @@ use std::fs::File;
 use std::env;
 
 use std::net::UdpSocket;
+
+use gp_daq::io::cfg::YamlIOable;
+
 
 fn main() {
     let args: Vec<_> = env::args().collect();
@@ -30,7 +32,7 @@ fn main() {
     for s in msg_str.split("---") {
         let _ = from_str::<Value>(s).map(|v| {
             //println!("{:?}", v);
-            let daq1 = gp_daq::msg::TrendMsg::from_yaml(&v);
+            let daq1 = gp_daq::msg_def::TrendMsg::from_yaml(&v);
             let data = daq1.to_byte_vec();
             println!("sending msg with size {}", data.len());
 

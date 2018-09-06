@@ -1,5 +1,5 @@
-use super::msg;
-use super::msgcont;
+use super::super::msg_def::msg;
+use super::super::msg_def::msgcont;
 
 use serde_yaml::{Mapping, Value};
 use std::default::Default;

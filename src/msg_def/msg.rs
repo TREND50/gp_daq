@@ -1,4 +1,4 @@
-use msgcont::{self, Decode};
+use super::msgcont::{self, Decode};
 use std;
 #[derive(Debug)]
 pub enum TrendMsg {

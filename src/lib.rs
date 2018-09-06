@@ -7,9 +7,6 @@ extern crate tokio;
 extern crate bytes;
 
 
-pub mod cfg;
-pub mod event_file;
-pub mod msg;
-pub mod msgcont;
-pub mod server;
-pub mod codec;
+pub mod msg_def;
+pub mod io;
+pub mod net;

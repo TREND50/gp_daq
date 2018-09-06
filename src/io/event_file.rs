@@ -1,7 +1,7 @@
 use std;
 use std::io::{Read, Write};
 
-use super::msgcont::Data;
+use super::super::msg_def::msgcont::Data;
 
 pub trait FromByteStream: Default + Sized {
     fn read_from<R: Read>(reader: &mut R) -> Option<Self> {
