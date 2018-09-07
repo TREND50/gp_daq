@@ -1,0 +1,9 @@
+msg_type: DATA
+ip: 0x11223344
+ts2: 123
+ts1trigger: 2
+ts1pps: 6
+sss: 4
+event_count: 123
+trig_pattern: 1
+data: [1,2,3,4]
