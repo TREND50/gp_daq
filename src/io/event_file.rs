@@ -208,9 +208,9 @@ impl ToByteStream for LocalStationHeader {}
 
 #[derive(Eq, PartialEq, Clone, Debug)]
 pub struct LocalStation {
-    header: LocalStationHeader,
-    header_data: Vec<u16>,
-    adc_buffer: Vec<u16>,
+    pub header: LocalStationHeader,
+    pub header_data: Vec<u16>,
+    pub adc_buffer: Vec<u16>,
 }
 
 impl LocalStation {
@@ -263,8 +263,8 @@ impl LocalStation {
 
 #[derive(Eq, PartialEq, Clone, Debug)]
 pub struct Event {
-    header: EventHeader,
-    local_station_list: Vec<LocalStation>,
+    pub header: EventHeader,
+    pub local_station_list: Vec<LocalStation>,
 }
 
 impl Event {
