@@ -2,6 +2,7 @@ use std;
 use std::io::{Read, Write};
 
 use super::super::msg_def::msgcont::Data;
+use std::fmt::{self, Display, Formatter};
 
 trait FromByteStream: Default + Sized {
     fn read_from<R: Read>(reader: &mut R) -> Option<Self> {
@@ -60,6 +61,26 @@ pub struct BasicFileHeader {
     pub first_event_sec: u32,
     pub last_event: u32,
     pub last_event_sec: u32,
+}
+
+impl Display for BasicFileHeader {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        writeln!(f, "length: {}", self.length).and(writeln!(f, "runnr: {}", self.runnr).and(
+            writeln!(f, "run_mod: {}", self.run_mod).and(
+                writeln!(f, "serial: {}", self.seral).and(
+                    writeln!(f, "first_event: {}", self.first_event).and(
+                        writeln!(f, "first_event_sec: {}", self.first_event_sec).and(
+                            writeln!(f, "last_event: {}", self.last_event).and(writeln!(
+                                f,
+                                "last_event_sec: {}",
+                                self.last_event_sec
+                            )),
+                        ),
+                    ),
+                ),
+            ),
+        ))
+    }
 }
 
 impl FromByteStream for BasicFileHeader {}
@@ -123,6 +144,16 @@ impl FileHeader {
     }
 }
 
+impl Display for FileHeader {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        writeln!(f, "{}", self.basic_header).and(writeln!(
+            f,
+            "additional_header: {:#?}",
+            self.additional_header
+        ))
+    }
+}
+
 #[derive(Default, Eq, PartialEq, Clone, Copy, Debug)]
 #[repr(C)]
 pub struct EventHeader {
@@ -157,6 +188,34 @@ impl EventHeader {
             ad2: 0,
             ls_cnt: 1,
         }
+    }
+}
+
+impl Display for EventHeader {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        writeln!(f, "header_length: {}", self.header_length).and(
+            writeln!(f, "runnr: {}", self.runnr).and(writeln!(f, "eventnr: {}", self.eventnr).and(
+                writeln!(f, "t3eventnr: {}", self.t3eventnr).and(
+                    writeln!(f, "first_ls: {}", self.first_ls).and(
+                        writeln!(f, "event_sec: {}", self.event_sec).and(
+                            writeln!(f, "event_nsec: {}", self.event_nsec).and(
+                                writeln!(f, "event_type: {}", self.event_type).and(
+                                    writeln!(f, "event_vers: {}", self.event_vers).and(
+                                        writeln!(f, "ad1: {}", self.ad1).and(
+                                            writeln!(f, "ad2: {}", self.ad2).and(writeln!(
+                                                f,
+                                                "ls_cnt: {}",
+                                                self.ls_cnt
+                                            )),
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            )),
+        )
     }
 }
 
@@ -200,6 +259,42 @@ impl LocalStationHeader {
             trace_length: 0,
             version: 0,
         }
+    }
+}
+
+impl Display for LocalStationHeader {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        writeln!(f, "length: {}", self.length).and(
+            writeln!(f, "event_nr: {}", self.event_nr).and(
+                writeln!(f, "ls_id: {}", self.ls_id).and(
+                    writeln!(f, "header_length: {}", self.header_length).and(
+                        writeln!(f, "gps_seconds: {}", self.gps_seconds).and(
+                            writeln!(f, "gps_nanoseconds: {}", self.gps_nanoseconds).and(
+                                writeln!(f, "trigger_flag: {}", self.trigger_flag).and(
+                                    writeln!(f, "trigger_pos: {}", self.trigger_pos).and(
+                                        writeln!(f, "sampling_freq: {}", self.sampling_freq).and(
+                                            writeln!(f, "channel_mask: {}", self.channel_mask).and(
+                                                writeln!(
+                                                    f,
+                                                    "adc_resolution: {}",
+                                                    self.adc_resolution
+                                                ).and(
+                                                    writeln!(
+                                                        f,
+                                                        "trace_length: {}",
+                                                        self.trace_length
+                                                    ).and(writeln!(f, "version: {}", self.version)),
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
     }
 }
 
@@ -258,6 +353,18 @@ impl LocalStation {
         self.header.write_to(writer);
         write_vec_to(&self.header_data, writer);
         write_vec_to(&self.adc_buffer, writer);
+    }
+}
+
+impl Display for LocalStation {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        writeln!(f, "header: {}", self.header).and(
+            writeln!(f, "header_data: {:#?}", self.header_data).and(writeln!(
+                f,
+                "payload: [u16; {}]",
+                self.adc_buffer.len()
+            )),
+        )
     }
 }
 
@@ -331,6 +438,16 @@ impl Event {
     }
 }
 
+impl Display for Event {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        writeln!(f, "header: {}", self.header).and(writeln!(
+            f,
+            "with payload of [LS; {}]",
+            self.local_station_list.len()
+        ))
+    }
+}
+
 #[derive(Eq, PartialEq, Clone, Debug)]
 pub struct EventFile {
     pub header: FileHeader,
@@ -358,5 +475,15 @@ impl EventFile {
         for ev in &self.event_list {
             ev.write_to(writer);
         }
+    }
+}
+
+impl Display for EventFile {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        writeln!(f, "header: {}", self.header).and(writeln!(
+            f,
+            "event_list: [e; {}]",
+            self.event_list.len()
+        ))
     }
 }
