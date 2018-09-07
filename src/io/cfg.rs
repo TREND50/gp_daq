@@ -81,6 +81,57 @@ pub fn load_u8(data: &Value, k: &str) -> Option<u8> {
     }
 }
 
+pub fn load_vpower1456(data:&Value, k:&str)->Option<u16>{//encode
+    if data[k].is_u64(){
+        load_u16(data, k)
+    }else if data[k].is_f64(){
+        let vp=data[k].as_f64().unwrap();
+        Some((vp/5.0*2.0/24.0* ((1_u16 << 12) as f64)) as u16)
+    }else{
+        None
+    }
+}
+
+pub fn load_vpower23(data:&Value, k:&str)->Option<u16>{//encode
+    if data[k].is_u64(){
+        load_u16(data, k)
+    }else if data[k].is_f64(){
+        let vp=data[k].as_f64().unwrap();
+        Some((vp/5.0*2.2/6.9* ((1_u16 << 12) as f64)) as u16)
+    }else{
+        None
+    }
+}
+
+pub fn load_th(data:&Value, k:&str)->Option<u16>{
+    if data[k].is_u64(){
+        load_u16(data, k)
+    }else if data[k].is_f64(){
+        let th=data[k].as_f64().unwrap();
+        Some((th/0.5) as u16)
+    }else{
+        None
+    }
+}
+
+pub fn load_temp(data:&Value, k:&str)->Option<u16>{
+    if data[k].is_u64(){
+        load_u16(data, k)
+    }else if data[k].is_f64(){
+        let temp=data[k].as_f64().unwrap();
+        let sign:u16=if temp<0. { 0b1000000000000} else {0};
+        let mut x12=(temp.abs()/0.0625) as u16 & 0b111111111111;
+        if sign!=0{
+            x12=!x12;
+        }
+        Some(sign+x12)
+    }
+    else{
+        None
+    }
+}
+
+
 pub fn store_u64(data: &mut Value, k: &str, v: u64) {
     data[k] = From::from(v);
 }
@@ -95,6 +146,27 @@ pub fn store_u16(data: &mut Value, k: &str, v: u16) {
 
 pub fn store_u8(data: &mut Value, k: &str, v: u8) {
     data[k] = From::from(v);
+}
+
+pub fn store_vpower1456(data:&mut Value, k:&str, v:u16){
+    data[k]=From::from(v as f64/((1_u16 << 12) as f64) * 24.0 / 2.0 * 5.0);
+}
+
+pub fn store_vpower23(data:&mut Value, k:&str, v:u16){
+    data[k]=From::from(v as f64/((1_u16 << 12) as f64) * 6.9 / 2.2 * 5.0);
+}
+
+pub fn store_th(data:&mut Value, k:&str, v:u16){
+    data[k]=From::from(v as f64*0.5);
+}
+
+pub fn store_temp(data:&mut Value, k:&str, v:u16){
+    let sign=v&0b1000000000000;
+    let mut x12= v& 0b111111111111;
+    if sign!=0{
+        x12=(!x12)&0b111111111111;
+    }
+    data[k]=From::from(if sign!=0 {-(x12 as f64)*0.0625} else {x12 as f64*0.0625})
 }
 
 macro_rules! yaml_io{
@@ -199,19 +271,19 @@ impl YamlIOable for msgcont::Data {
 impl YamlIOable for msgcont::Slc {
     yaml_io![
         (ip, set_ip, store_u32, load_u32),
-        (vpower1, set_vpower1, store_u16, load_u16),
-        (vpower2, set_vpower2, store_u16, load_u16),
-        (vpower3, set_vpower3, store_u16, load_u16),
-        (vpower4, set_vpower4, store_u16, load_u16),
-        (vpower5, set_vpower5, store_u16, load_u16),
-        (vpower6, set_vpower6, store_u16, load_u16),
-        (th1m, set_th1m, store_u16, load_u16),
-        (th1p, set_th1p, store_u16, load_u16),
-        (th2m, set_th2m, store_u16, load_u16),
-        (th2p, set_th2p, store_u16, load_u16),
-        (th3m, set_th3m, store_u16, load_u16),
-        (th3p, set_th3p, store_u16, load_u16),
-        (temp, set_temp, store_u16, load_u16),
+        (vpower1, set_vpower1, store_vpower1456, load_vpower1456),
+        (vpower2, set_vpower2, store_vpower23, load_vpower23),
+        (vpower3, set_vpower3, store_vpower23, load_vpower23),
+        (vpower4, set_vpower4, store_vpower1456, load_vpower1456),
+        (vpower5, set_vpower5, store_vpower1456, load_vpower1456),
+        (vpower6, set_vpower6, store_vpower1456, load_vpower1456),
+        (th1m, set_th1m, store_th, load_th),
+        (th1p, set_th1p, store_th, load_th),
+        (th2m, set_th2m, store_th, load_th),
+        (th2p, set_th2p, store_th, load_th),
+        (th3m, set_th3m, store_th, load_th),
+        (th3p, set_th3p, store_th, load_th),
+        (temp, set_temp, store_temp, load_temp),
         (total_trig_rate, set_total_rate, store_u32, load_u32),
         (ch1p_trig_rate, set_ch1p_trig_rate, store_u32, load_u32),
         (ch2p_trig_rate, set_ch2p_trig_rate, store_u32, load_u32),
