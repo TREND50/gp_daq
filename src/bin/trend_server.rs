@@ -32,7 +32,7 @@ fn main() {
     server.register_handler(Box::new(move |a:&TrendMsg, b|{
         if let TrendMsg::Ack {content}=a{
             println!("forwarding ack");
-            send_msg("127.0.0.1:6666", TrendMsg::Ack {content:Ack_([content.0[0], content.0[1]])}, None);
+            send_msg(format!("127.0.0.1:{}", monitor_port), TrendMsg::Ack {content:Ack_([content.0[0], content.0[1]])}, None);
         }
     }));
 
