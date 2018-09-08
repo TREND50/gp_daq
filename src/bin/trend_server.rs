@@ -11,13 +11,17 @@ use gp_daq::io::cfg::YamlIOable;
 use gp_daq::io::event_file::{Event, FileHeader};
 use gp_daq::msg_def::TrendMsg;
 use gp_daq::net::server::TrendServer;
+use gp_daq::net::client::send_msg;
+use gp_daq::msg_def::msgcont::Ack_;
 
 fn main() {
     let args: Vec<_> = std::env::args().into_iter().collect();
-    if args.len() < 2 {
-        eprintln!("Usage: {} <port> [out file prefix]", args[0]);
+    if args.len() < 3 {
+        eprintln!("Usage: {} <addr:port> <monitor port> [out file prefix]", args[0]);
         return;
     }
+
+    let monitor_port:u16=args[2].parse().expect("invalid monitor port");
 
     let mut server = TrendServer::new(args[1].parse().expect("invalid port"));
     server.register_handler(Box::new(|a, b| {
@@ -25,19 +29,26 @@ fn main() {
         println!("msg:\n{:?}", a);
     }));
 
-    if args.len() >= 3 {
-        let file_prefix = args[2].clone();
+    server.register_handler(Box::new(move |a:&TrendMsg, b|{
+        if let TrendMsg::Ack {content}=a{
+            println!("forwarding ack");
+            send_msg("127.0.0.1:6666", TrendMsg::Ack {content:Ack_([content.0[0], content.0[1]])}, None);
+        }
+    }));
+
+    if args.len() >= 4 {
+        let file_prefix = args[3].clone();
         let mut txt_file = OpenOptions::new()
             .create(true)
             .append(true)
             .open(file_prefix + ".yaml")
             .expect("cannot open file");
-        let file_prefix = args[2].clone();
+        let file_prefix = args[3].clone();
         let mut bin_file = File::create(file_prefix + ".bin").unwrap();
         let fh = FileHeader::new();
         fh.write_to(&mut bin_file);
 
-        server.register_handler(Box::new(move |a, _b| {
+        server.register_handler(Box::new(move |a, b| {
             match a {
                 &TrendMsg::Data {
                     ref content,

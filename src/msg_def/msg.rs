@@ -169,7 +169,7 @@ impl TrendMsg {
                     let mut payload = Vec::with_capacity((data.len() - 3 - cont_len) * 2);
                     for d in &data[2 + cont_len..data.len() - 1] {
                         payload.push((*d & 0xfff) as u16);
-                        payload.push(((*d & 0xfff000)>>12) as u16);
+                        payload.push(((*d & 0xfff000) >> 12) as u16);
                     }
                     msgcont::Data::decode(&data[2..]).map(|x| TrendMsg::Data {
                         content: x,

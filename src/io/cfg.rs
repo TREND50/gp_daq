@@ -81,56 +81,56 @@ pub fn load_u8(data: &Value, k: &str) -> Option<u8> {
     }
 }
 
-pub fn load_vpower1456(data:&Value, k:&str)->Option<u16>{//encode
-    if data[k].is_u64(){
+pub fn load_vpower1456(data: &Value, k: &str) -> Option<u16> {
+    //encode
+    if data[k].is_u64() {
         load_u16(data, k)
-    }else if data[k].is_f64(){
-        let vp=data[k].as_f64().unwrap();
-        Some((vp/5.0*2.0/24.0* ((1_u16 << 12) as f64)) as u16)
-    }else{
+    } else if data[k].is_f64() {
+        let vp = data[k].as_f64().unwrap();
+        Some((vp / 5.0 * 2.0 / 24.0 * ((1_u16 << 12) as f64)) as u16)
+    } else {
         None
     }
 }
 
-pub fn load_vpower23(data:&Value, k:&str)->Option<u16>{//encode
-    if data[k].is_u64(){
+pub fn load_vpower23(data: &Value, k: &str) -> Option<u16> {
+    //encode
+    if data[k].is_u64() {
         load_u16(data, k)
-    }else if data[k].is_f64(){
-        let vp=data[k].as_f64().unwrap();
-        Some((vp/5.0*2.2/6.9* ((1_u16 << 12) as f64)) as u16)
-    }else{
+    } else if data[k].is_f64() {
+        let vp = data[k].as_f64().unwrap();
+        Some((vp / 5.0 * 2.2 / 6.9 * ((1_u16 << 12) as f64)) as u16)
+    } else {
         None
     }
 }
 
-pub fn load_th(data:&Value, k:&str)->Option<u16>{
-    if data[k].is_u64(){
+pub fn load_th(data: &Value, k: &str) -> Option<u16> {
+    if data[k].is_u64() {
         load_u16(data, k)
-    }else if data[k].is_f64(){
-        let th=data[k].as_f64().unwrap();
-        Some((th/0.5) as u16)
-    }else{
+    } else if data[k].is_f64() {
+        let th = data[k].as_f64().unwrap();
+        Some((th / 0.5) as u16)
+    } else {
         None
     }
 }
 
-pub fn load_temp(data:&Value, k:&str)->Option<u16>{
-    if data[k].is_u64(){
+pub fn load_temp(data: &Value, k: &str) -> Option<u16> {
+    if data[k].is_u64() {
         load_u16(data, k)
-    }else if data[k].is_f64(){
-        let temp=data[k].as_f64().unwrap();
-        let sign:u16=if temp<0. { 0b1000000000000} else {0};
-        let mut x12=(temp.abs()/0.0625) as u16 & 0b111111111111;
-        if sign!=0{
-            x12=!x12;
+    } else if data[k].is_f64() {
+        let temp = data[k].as_f64().unwrap();
+        let sign: u16 = if temp < 0. { 0b1000000000000 } else { 0 };
+        let mut x12 = (temp.abs() / 0.0625) as u16 & 0b111111111111;
+        if sign != 0 {
+            x12 = !x12;
         }
-        Some(sign+x12)
-    }
-    else{
+        Some(sign + x12)
+    } else {
         None
     }
 }
-
 
 pub fn store_u64(data: &mut Value, k: &str, v: u64) {
     data[k] = From::from(v);
@@ -148,25 +148,29 @@ pub fn store_u8(data: &mut Value, k: &str, v: u8) {
     data[k] = From::from(v);
 }
 
-pub fn store_vpower1456(data:&mut Value, k:&str, v:u16){
-    data[k]=From::from(v as f64/((1_u16 << 12) as f64) * 24.0 / 2.0 * 5.0);
+pub fn store_vpower1456(data: &mut Value, k: &str, v: u16) {
+    data[k] = From::from(v as f64 / ((1_u16 << 12) as f64) * 24.0 / 2.0 * 5.0);
 }
 
-pub fn store_vpower23(data:&mut Value, k:&str, v:u16){
-    data[k]=From::from(v as f64/((1_u16 << 12) as f64) * 6.9 / 2.2 * 5.0);
+pub fn store_vpower23(data: &mut Value, k: &str, v: u16) {
+    data[k] = From::from(v as f64 / ((1_u16 << 12) as f64) * 6.9 / 2.2 * 5.0);
 }
 
-pub fn store_th(data:&mut Value, k:&str, v:u16){
-    data[k]=From::from(v as f64*0.5);
+pub fn store_th(data: &mut Value, k: &str, v: u16) {
+    data[k] = From::from(v as f64 * 0.5);
 }
 
-pub fn store_temp(data:&mut Value, k:&str, v:u16){
-    let sign=v&0b1000000000000;
-    let mut x12= v& 0b111111111111;
-    if sign!=0{
-        x12=(!x12)&0b111111111111;
+pub fn store_temp(data: &mut Value, k: &str, v: u16) {
+    let sign = v & 0b1000000000000;
+    let mut x12 = v & 0b111111111111;
+    if sign != 0 {
+        x12 = (!x12) & 0b111111111111;
     }
-    data[k]=From::from(if sign!=0 {-(x12 as f64)*0.0625} else {x12 as f64*0.0625})
+    data[k] = From::from(if sign != 0 {
+        -(x12 as f64) * 0.0625
+    } else {
+        x12 as f64 * 0.0625
+    })
 }
 
 macro_rules! yaml_io{
