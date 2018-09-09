@@ -38,15 +38,17 @@ impl TrendServer {
         }
     }
 
-    pub fn wait_for(&mut self, dt:Option<Duration>)->Option<TrendMsg>{
+    pub fn wait_for(&mut self, dt: Option<Duration>) -> Option<TrendMsg> {
         let mut buf = vec![0_u8; 65536];
-        self.socket.set_read_timeout(dt).expect("set timeout failed");
-        if let Ok((s, _addr)) = self.socket.recv_from(&mut buf[..]){
+        self.socket
+            .set_read_timeout(dt)
+            .expect("set timeout failed");
+        if let Ok((s, _addr)) = self.socket.recv_from(&mut buf[..]) {
             assert!(s <= buf.len());
             unsafe { buf.set_len(s) };
             //println!("{}", buf.len());
             TrendMsg::from_byte_vec(buf)
-        }else{
+        } else {
             None
         }
     }
@@ -64,8 +66,11 @@ pub fn create_async_server(
     handler: impl FnMut((TrendMsg, SocketAddr)) -> Result<(), <UdpFramed<MsgDecoder> as Stream>::Error>,
 ) -> impl Future<Item = (), Error = ()> {
     println!("port={}", addr.port());
-    UdpFramed::new(TUdpSocket::bind(&addr).expect("bind failed3"), MsgDecoder {})
-        //.for_each(|(msg, _socket)| { Ok(())})
-        .for_each(handler)
-        .map_err(|_err| {})
+    UdpFramed::new(
+        TUdpSocket::bind(&addr).expect("bind failed3"),
+        MsgDecoder {},
+    )
+    //.for_each(|(msg, _socket)| { Ok(())})
+    .for_each(handler)
+    .map_err(|_err| {})
 }

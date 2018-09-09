@@ -9,19 +9,22 @@ use std::io::Write;
 
 use gp_daq::io::cfg::YamlIOable;
 use gp_daq::io::event_file::{Event, FileHeader};
-use gp_daq::msg_def::TrendMsg;
-use gp_daq::net::server::TrendServer;
-use gp_daq::net::client::send_msg;
 use gp_daq::msg_def::msgcont::Ack_;
+use gp_daq::msg_def::TrendMsg;
+use gp_daq::net::client::send_msg;
+use gp_daq::net::server::TrendServer;
 
 fn main() {
     let args: Vec<_> = std::env::args().into_iter().collect();
     if args.len() < 3 {
-        eprintln!("Usage: {} <addr:port> <monitor port> [out file prefix]", args[0]);
+        eprintln!(
+            "Usage: {} <addr:port> <monitor port> [out file prefix]",
+            args[0]
+        );
         return;
     }
 
-    let monitor_port:u16=args[2].parse().expect("invalid monitor port");
+    let monitor_port: u16 = args[2].parse().expect("invalid monitor port");
 
     let mut server = TrendServer::new(args[1].parse().expect("invalid port"));
     server.register_handler(Box::new(|a, b| {
@@ -29,10 +32,16 @@ fn main() {
         println!("msg:\n{:?}", a);
     }));
 
-    server.register_handler(Box::new(move |a:&TrendMsg, b|{
-        if let TrendMsg::Ack {content}=a{
+    server.register_handler(Box::new(move |a: &TrendMsg, _b| {
+        if let TrendMsg::Ack { content } = a {
             println!("forwarding ack");
-            send_msg(format!("127.0.0.1:{}", monitor_port), TrendMsg::Ack {content:Ack_([content.0[0], content.0[1]])}, None);
+            send_msg(
+                format!("127.0.0.1:{}", monitor_port),
+                TrendMsg::Ack {
+                    content: Ack_([content.0[0], content.0[1]]),
+                },
+                None,
+            );
         }
     }));
 
@@ -48,7 +57,7 @@ fn main() {
         let fh = FileHeader::new();
         fh.write_to(&mut bin_file);
 
-        server.register_handler(Box::new(move |a, b| {
+        server.register_handler(Box::new(move |a, _b| {
             match a {
                 &TrendMsg::Data {
                     ref content,

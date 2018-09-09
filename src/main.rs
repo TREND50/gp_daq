@@ -14,20 +14,22 @@ use tokio::prelude::Stream;
 fn main() {
     let server1 = gp_daq::net::server::create_async_server(
         SocketAddr::from_str("0.0.0.0:1234").unwrap(),
-        |(msg, socket)| {
+        |(msg, _socket)| {
             println!("{:?}", msg);
             Ok(())
         },
     );
     let server2 = gp_daq::net::server::create_async_server(
         SocketAddr::from_str("0.0.0.0:1235").unwrap(),
-        |(msg, socket)| {
+        |(msg, _socket)| {
             println!("{:?}", msg);
             Ok(())
         },
     );
 
-    let j=std::thread::spawn(||{tokio::run(server1.join(server2).map(|_| {}));});
+    let _j = std::thread::spawn(|| {
+        tokio::run(server1.join(server2).map(|_| {}));
+    });
     println!("a");
     //tokio::run(server1);
 }

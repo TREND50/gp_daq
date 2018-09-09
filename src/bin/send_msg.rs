@@ -31,7 +31,7 @@ fn main() {
     ))).expect("Cannot open file");
     let addr = env::args().nth(2).expect("Invalid addr");
 
-    let monitor_port:u16=args[3].parse().expect("invalid monitor port");
+    let monitor_port: u16 = args[3].parse().expect("invalid monitor port");
 
     let mut bytes = Vec::new();
     f.read_to_end(&mut bytes).expect("Cannot read file");
