@@ -91,5 +91,13 @@ to receive ```ACK``` message from the DAQ board (well, actually the
 ```127.0.0.1:<monitor port>```. The content of the message to be sent
 is written in a ```YAML``` file, which is basically a key-value table.
 
+2. Run the data receiving server
+```
+trend_server 0.0.0.0:<port> <monitor port> [data file prefix]
+```
+, where <port> is the port used to receive message from the DAQ boards,
+and <monitor port> is used to forward ACK messages to ```send_msg```
+program to check whether the board responses to the sent controlling
+messages.
 
 
