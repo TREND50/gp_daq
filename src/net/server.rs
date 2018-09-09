@@ -2,8 +2,9 @@ use super::super::msg_def::msg::TrendMsg;
 
 use super::codec::MsgDecoder;
 use std;
-use std::net::{Ipv4Addr, SocketAddr, UdpSocket};
-use tokio::codec::Decoder;
+use std::net::{SocketAddr, UdpSocket};
+use std::time::Duration;
+//use tokio::codec::Decoder;
 use tokio::net::{UdpFramed, UdpSocket as TUdpSocket};
 use tokio::prelude::Future;
 use tokio::prelude::Stream;
@@ -37,20 +38,16 @@ impl TrendServer {
         }
     }
 
-    pub fn wait(&mut self){
+    pub fn wait_for(&mut self, dt:Option<Duration>)->Option<TrendMsg>{
         let mut buf = vec![0_u8; 65536];
-        let (s, addr) = self.socket.recv_from(&mut buf[..]).unwrap();
-        assert!(s <= buf.len());
-        unsafe { buf.set_len(s) };
-        //println!("{}", buf.len());
-
-        match TrendMsg::from_byte_vec(buf) {
-            Some(ref msg) => {
-                for h in &mut self.handlers {
-                    h(&msg, addr);
-                }
-            }
-            _ => (),
+        self.socket.set_read_timeout(dt).expect("set timeout failed");
+        if let Ok((s, _addr)) = self.socket.recv_from(&mut buf[..]){
+            assert!(s <= buf.len());
+            unsafe { buf.set_len(s) };
+            //println!("{}", buf.len());
+            TrendMsg::from_byte_vec(buf)
+        }else{
+            None
         }
     }
 

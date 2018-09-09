@@ -16,12 +16,13 @@ use gp_daq::msg_def::msgcont;
 
 fn main() {
     let args: Vec<_> = std::env::args().into_iter().collect();
-    if args.len() < 2 {
-        eprintln!("Usage: {} <addr:port> [out file prefix]", args[0]);
+    if args.len() < 3 {
+        eprintln!("Usage: {} <addr:port> <controller slc port>", args[0]);
         return;
     }
 
     let mut server = TrendServer::new(args[1].parse().expect("invalid port"));
+    let slc_port:u16=args[2].parse().expect("Not a valid slc port");
     server.register_handler(Box::new(|a, b| {
         println!("recv from {:?}", b);
         println!("msg:\n{:?}", a);
@@ -39,7 +40,7 @@ fn main() {
                     let mut ack=msgcont::Ack_([0_u32,0_u32]);
                     ack.set_ip(ipu32);
                     ack.set_msg_ack(m.type_code() as u16);
-                    let back_addr=std::net::SocketAddr::V4(std::net::SocketAddrV4::new(ip4, 1235));
+                    let back_addr=std::net::SocketAddr::V4(std::net::SocketAddrV4::new(ip4, slc_port));
                     println!("ack sent");
                     println!("{}", back_addr.port());
                     send_msg(back_addr, TrendMsg::Ack {content:ack}, None);
