@@ -66,11 +66,13 @@ fn main() {
                     let ev = Event::from_trend_data(&content, &payload);
                     ev.write_to(&mut bin_file);
                 }
-                _ => (),
+                &TrendMsg::Ack {..}=>(),
+                &ref msg => {
+                    let v = msg.to_yaml();
+                    serde_yaml::to_writer(&mut txt_file, &v).expect("write failed");
+                    write!(txt_file, "\n");
+                },
             }
-            let v = a.to_yaml();
-            serde_yaml::to_writer(&mut txt_file, &v).expect("write failed");
-            write!(txt_file, "\n");
         }));
     }
     server.run();
