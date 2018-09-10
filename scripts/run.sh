@@ -1,5 +1,8 @@
 #!/bin/sh
 
+SELF_PATH=`realpath $0`
+SELF_DIR=`dirname $SELF_PATH`
+CFG_DIR=$SELF_DIR/../cfgs
 
 if [ $# != 6 ]
 then
