@@ -25,7 +25,7 @@ if tmux ls 2>/dev/null
 then
     for i in `tmux ls|awk -F ':' '{print $1}'`
     do
-		if [ $i == $SESSION_NAME ]
+		if [ $i = $SESSION_NAME ]
 		then
 			session_exists=1
 			#echo "Session exists."
@@ -34,7 +34,7 @@ then
     done
 fi
 
-if [ $session_exists == 0 ]
+if [ $session_exists = 0 ]
 then
 #        echo "Starting session."
 	tmux new -d -s $SESSION_NAME
@@ -48,7 +48,7 @@ sleep .5  # Needed on laptop
 echo "Now sending message to board."
 
 echo $loop
-if [ "$loop" == 1 ]
+if [ "$loop" = 1 ]
 then
   for i in {1..100}
   do
