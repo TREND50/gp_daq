@@ -42,19 +42,19 @@ echo 'New run ID' $NRUN
 
 if [ $2 = "0"  ]
 then
-  patterncfg=${CFG_DIR}/pattern_zeros.cfg
+  patterncfg=${CFG_DIR}/pattern_zeros.yaml
 elif  [ $2 = "1"  ]
 then
-  patterncfg=${CFG_DIR}/pattern_ones.cfg
+  patterncfg=${CFG_DIR}/pattern_ones.yaml
 elif  [ $2 = "2"  ]
 then
-  patterncfg=${CFG_DIR}/pattern_toggle.cfg
+  patterncfg=${CFG_DIR}/pattern_toggle.yaml
 elif  [ $2 = "3"  ]
 then
-  patterncfg=${CFG_DIR}/pattern_deskew.cfg
+  patterncfg=${CFG_DIR}/pattern_deskew.yaml
 elif  [ $2 = "4"  ]
 then
-  patterncfg=${CFG_DIR}/pattern_sync.cfg
+  patterncfg=${CFG_DIR}/pattern_sync.yaml
 else  
   echo 'Wrong parameter value. Aborting.'
   exit -1
@@ -68,7 +68,7 @@ $SELF_DIR/run.sh 1236 192.168.1.1$BOARDID $patterncfg $DATADIR/P$NRUN'_b'$BOARDI
 #sleep 2
 
 # Log run id
-cp $patterncfg  $DATADIR/P$NRUN'_b'$BOARDID.cfg
+cp $patterncfg  $DATADIR/P$NRUN'_b'$BOARDID.yaml
 rm $DATADIR/last_run.txt
 echo $NRUN >> $DATADIR/last_run.txt
 echo "Now killing tmux window w." 
