@@ -1,2 +1,2 @@
-pub mod cfg;
+pub mod yaml;
 pub mod event_file;

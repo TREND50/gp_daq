@@ -13,7 +13,7 @@ use std::env;
 
 use std::net::UdpSocket;
 
-use gp_daq::io::cfg::YamlIOable;
+use gp_daq::io::yaml::YamlIOable;
 
 use gp_daq::net::client::send_msg;
 
@@ -21,12 +21,12 @@ fn main() {
     let args: Vec<_> = env::args().collect();
 
     if args.len() != 4 {
-        eprintln!("Usage: {} <cfg file> <addr:port> <monitor port>", args[0]);
+        eprintln!("Usage: {} <yaml file> <addr:port> <monitor port>", args[0]);
         return;
     }
 
     let mut f = File::open(env::args().nth(1).expect(&format!(
-        "Usage: {} <cfg> <addr:port>",
+        "Usage: {} <yaml> <addr:port>",
         env::args().nth(0).unwrap()
     ))).expect("Cannot open file");
     let addr = env::args().nth(2).expect("Invalid addr");
