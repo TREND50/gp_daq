@@ -18,7 +18,7 @@ use gp_daq::net::client::send_msg;
 use gp_daq::net::server::TrendServer;
 
 //deprecated
-use gp_daq::io::txt;
+//use gp_daq::io::txt;
 
 fn main() {
     let args: Vec<_> = std::env::args().into_iter().collect();
@@ -58,12 +58,14 @@ fn main() {
             .append(true)
             .open(file_prefix + ".yaml")
             .expect("cannot open file");
+        /*
         let file_prefix = args[3].clone();
         let mut txt_file = OpenOptions::new()
             .create(true)
             .append(true)
             .open(file_prefix + ".txt")
             .expect("cannot open file");
+        */
         let file_prefix = args[3].clone();
         let mut bin_file = File::create(file_prefix + ".bin").unwrap();
         let fh = FileHeader::new();
@@ -97,7 +99,7 @@ fn main() {
                     write!(yaml_file, "\n");
                 },
             }
-            msg.write_to_txt(&mut txt_file, &now).unwrap();
+            //msg.write_to_txt(&mut txt_file, &now).unwrap();
         }));
     }
     server.run();
