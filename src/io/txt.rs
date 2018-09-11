@@ -1,7 +1,6 @@
 use std;
 use std::io::Write;
 use super::super::msg_def::msg;
-use super::super::msg_def::msgcont;
 use chrono::DateTime;
 use chrono::offset::Utc;
 
