@@ -1,7 +1,8 @@
 # Grandproto Data Acquisition program
 
 ## Why uspgrading from the original program?
-1. The original program was written in C++, which has much less modern
+1. The [original program](https://github.com/TREND50/GRANDproto_DAQ)
+was written in C++, which has much less modern
 features compared with the currently using
 [RUST](http://www.rust-lang.org) language.
 2. The original version was finished in a very short time, and not well
