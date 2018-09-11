@@ -50,7 +50,7 @@ echo "Now sending message to board."
 echo $loop
 if [ "$loop" = 1 ]
 then
-  for i in {1..100}
+  for i in `seq 1 100`
   do
     echo "Now sending request" $i ", then sleep 0.1s."
     send_msg $CFG "${BIP}:${BPORT}" ${MON_PORT}
