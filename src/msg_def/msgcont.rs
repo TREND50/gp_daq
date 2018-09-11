@@ -210,7 +210,7 @@ bitfield!{
     pub struct Slc_([u32]);
     impl Debug;
     u32;
-    pub ip, set_ip:32,0;
+    pub ip, set_ip:31,0;
     pub u16,vpower1, set_vpower1:32+11,32+0;
     pub u16,vpower2, set_vpower2:32+23,32+12;
     pub u16,vpower3, set_vpower3:64+11,64+0;
