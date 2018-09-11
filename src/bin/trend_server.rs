@@ -88,6 +88,12 @@ fn main() {
                 } => {
                     let ev = Event::from_trend_data(&content, &payload);
                     ev.write_to(&mut bin_file);
+                    let mut v = msg.to_yaml();
+                    v["received_timestamp"]=From::from(vec![now.timestamp(),now.timestamp_subsec_nanos() as i64]);
+                    v["received_timestamp_str"]=From::from(now.to_string());
+                    v["source_ip"]=From::from(ip.clone());
+                    serde_yaml::to_writer(&mut yaml_file, &v).expect("write failed");
+                    write!(yaml_file, "\n");
                 }
                 &TrendMsg::Ack {..}=>(),
                 &ref msg => {
