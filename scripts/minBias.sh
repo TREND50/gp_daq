@@ -43,7 +43,7 @@ ${SELF_DIR}/run.sh  1236 192.168.1.1${BOARDID} ${CFG_DIR}/minbias.yaml  $DATADIR
 #done
 
 # Log run id
-cp minbias.cfg  $DATADIR/M$NRUN'_b'$BOARDID.cfg
+cp minbias.cfg  $DATADIR/M$NRUN'_b'$BOARDID.yaml
 rm $DATADIR/last_run.txt
 echo $NRUN >> $DATADIR/last_run.txt
 echo "Now killing tmux window w." 
