@@ -222,12 +222,12 @@ impl YamlIOable for msgcont::Trig {
         (st, set_st, store_u8, load_u8),
         (trg_en, set_trg_en, store_u8, load_u8),
         (cntrl_dac, set_cntrl_dac, store_u16, load_u16),
-        (th1m, set_th1m, store_u16, load_u16),
-        (th1p, set_th1p, store_u16, load_u16),
-        (th2m, set_th2m, store_u16, load_u16),
-        (th2p, set_th2p, store_u16, load_u16),
-        (th3m, set_th3m, store_u16, load_u16),
-        (th3p, set_th3p, store_u16, load_u16)
+        (th1m, set_th1m, store_th, load_th),
+        (th1p, set_th1p, store_th, load_th),
+        (th2m, set_th2m, store_th, load_th),
+        (th2p, set_th2p, store_th, load_th),
+        (th3m, set_th3m, store_th, load_th),
+        (th3p, set_th3p, store_th, load_th)
     ];
 }
 
