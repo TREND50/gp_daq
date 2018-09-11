@@ -47,4 +47,4 @@ cp $CFG_DIR/minbias.yaml  $DATADIR/M$NRUN'_b'$BOARDID.yaml
 rm $DATADIR/last_run.txt
 echo $NRUN >> $DATADIR/last_run.txt
 echo "Now killing tmux window w." 
-#tmux kill-window -t "w"
+tmux kill-window -t "w"
