@@ -25,7 +25,7 @@ use gp_daq::net::client::send_by_raw;
 fn u642mac(d: u64) -> [u8; 6] {
     let mut result = [0_u8; 6];
     for i in 0..6 {
-        result[i] = (d >> ((5 - i)*8) & 0xff) as u8;
+        result[i] = (d >> ((5 - i) * 8) & 0xff) as u8;
     }
     println!("{}\n{:?}", d, result);
     result
