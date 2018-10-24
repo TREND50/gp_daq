@@ -7,8 +7,8 @@ use std::env;
 use std::fs::{File, OpenOptions};
 use std::io::Write;
 
-use gp_daq::io::yaml::YamlIOable;
 use gp_daq::io::event_file::{Event, FileHeader};
+use gp_daq::io::yaml::YamlIOable;
 use gp_daq::msg_def::msgcont;
 use gp_daq::msg_def::TrendMsg;
 use gp_daq::net::client::send_msg;

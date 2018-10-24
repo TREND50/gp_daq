@@ -19,7 +19,7 @@ where
 
 bitfield!{
     #[repr(C)]
-    #[derive(Default)]
+    #[derive(Default, Clone)]
     pub struct Daq_([u32]);
     impl Debug;
     u32;
@@ -51,7 +51,7 @@ impl Decode for Daq {
 bitfield!{
 
     #[repr(C)]
-    #[derive(Default)]
+    #[derive(Default, Clone)]
     pub struct Trig_([u32]);
     impl Debug;
     u32;
@@ -94,7 +94,7 @@ impl Decode for Trig {
 
 bitfield!{
     #[repr(C)]
-    #[derive(Default)]
+    #[derive(Default, Clone)]
     pub struct Gps_([u32]);
     impl Debug;
     u32;
@@ -117,7 +117,7 @@ impl Decode for Gps {
 
 bitfield!{
     #[repr(C)]
-    #[derive(Default)]
+    #[derive(Default, Clone)]
     pub struct Adc_([u32]);
     impl Debug;
     u16;
@@ -139,7 +139,7 @@ impl Decode for Adc {
 
 bitfield!{
     #[repr(C)]
-    #[derive(Default)]
+    #[derive(Default, Clone)]
     pub struct IntReg_([u32]);
     impl Debug;
     u32;
@@ -148,11 +148,11 @@ bitfield!{
     pub u32,board_mac, set_board_mac: 32+31,32+0;
     pub u32,board_ip, set_board_ip:64+31, 64+0;
 
-    pub u64,dst_mac1, set_dst_mac1: 96+47,96+0;
-    pub u32,dst_ip1,set_dst_ip1:160+31, 160+0;
+    pub u64,srv_mac1, set_srv_mac1: 96+47,96+0;
+    pub u32,srv_ip1,set_srv_ip1:160+31, 160+0;
 
-    pub u64,dst_mac2, set_dst_mac2: 192+47,192+0;
-    pub u32,dst_ip2,set_dst_ip2:256+31, 256+0;
+    pub u64,srv_mac2, set_srv_mac2: 192+47,192+0;
+    pub u32,srv_ip2,set_srv_ip2:256+31, 256+0;
 
     pub u16, port1, set_port1:288+15,288+0;
     pub u16, port2, set_port2:320+15,320+0;
@@ -179,7 +179,7 @@ impl Decode for IntReg {
 
 bitfield!{
     #[repr(C)]
-    #[derive(Default)]
+    #[derive(Default, Clone)]
     pub struct Data_([u32]);
     impl Debug;
     u32;
@@ -206,7 +206,7 @@ impl Decode for Data {
 
 bitfield!{
     #[repr(C)]
-    #[derive(Default)]
+    #[derive(Default, Clone)]
     pub struct Slc_([u32]);
     impl Debug;
     u32;
@@ -253,7 +253,7 @@ impl Decode for Slc {
 
 bitfield!{
     #[repr(C)]
-    #[derive(Default)]
+    #[derive(Default, Clone)]
     pub struct RdIntReg_([u32]);
     impl Debug;
     u32;
@@ -261,11 +261,11 @@ bitfield!{
     pub u32,board_mac, set_board_mac:32+31, 32+0;
     pub u32,board_ip, set_board_ip:64+31, 64+0;
 
-    pub u64,dst_mac1, set_dst_mac1: 96+47,96+0;
-    pub u32,dst_ip1,set_dst_ip1:160+31, 160+0;
+    pub u64,srv_mac1, set_srv_mac1: 96+47,96+0;
+    pub u32,srv_ip1,set_srv_ip1:160+31, 160+0;
 
-    pub u64,dst_mac2, set_dst_mac2: 192+47,192+0;
-    pub u32,dst_ip2,set_dst_ip2:256+31, 256+0;
+    pub u64,srv_mac2, set_srv_mac2: 192+47,192+0;
+    pub u32,srv_ip2,set_srv_ip2:256+31, 256+0;
 
     pub u16, port1, set_port1:288+15,288+0;
     pub u16, port2, set_port2:320+15,320+0;
@@ -287,7 +287,7 @@ impl Decode for RdIntReg {
 
 bitfield!{
     #[repr(C)]
-    #[derive(Default)]
+    #[derive(Default, Clone)]
     pub struct Ack_([u32]);
     impl Debug;
     u32;

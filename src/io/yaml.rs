@@ -28,6 +28,16 @@ pub fn load_vec_u8(data: &Value, k: &str) -> Option<Vec<u8>> {
         .map(|x| x.iter().map(|ref x| x.as_u64().unwrap() as u8).collect())
 }
 
+pub fn load_vec_to_u32(data: &Value, k: &str) -> Option<u32> {
+    data[k].as_sequence().map(|x| {
+        let mut result: u32 = 0;
+        for (i, v) in x.iter().rev().enumerate() {
+            result += (v.as_u64().unwrap() << (i * 8)) as u32;
+        }
+        result
+    })
+}
+
 pub fn load_str(data: &Value, k: &str) -> Option<String> {
     data[k].as_str().map(|ref x| x.to_string())
 }
@@ -152,6 +162,14 @@ pub fn store_vpower1456(data: &mut Value, k: &str, v: u16) {
     data[k] = From::from(v as f64 / ((1_u16 << 12) as f64) * 24.0 / 2.0 * 5.0);
 }
 
+pub fn store_u32_to_vec(data: &mut Value, k: &str, v: u32) {
+    let mut result = Vec::<u8>::new();
+    for i in 0..4 {
+        result.push(((v >> ((3 - i) * 8)) & 0xff) as u8);
+    }
+    data[k] = From::from(result);
+}
+
 pub fn store_vpower23(data: &mut Value, k: &str, v: u16) {
     data[k] = From::from(v as f64 / ((1_u16 << 12) as f64) * 6.9 / 2.2 * 5.0);
 }
@@ -250,11 +268,11 @@ impl YamlIOable for msgcont::IntReg {
     yaml_io![
         (write, set_write, store_u8, load_u8),
         (board_mac, set_board_mac, store_u32, load_u32),
-        (board_ip, set_board_ip, store_u32, load_u32),
-        (dst_mac1, set_dst_mac1, store_u64, load_u64),
-        (dst_ip1, set_dst_ip1, store_u32, load_u32),
-        (dst_mac2, set_dst_mac2, store_u64, load_u64),
-        (dst_ip2, set_dst_ip2, store_u32, load_u32),
+        (board_ip, set_board_ip, store_u32_to_vec, load_vec_to_u32),
+        (srv_mac1, set_srv_mac1, store_u64, load_u64),
+        (srv_ip1, set_srv_ip1, store_u32_to_vec, load_vec_to_u32),
+        (srv_mac2, set_srv_mac2, store_u64, load_u64),
+        (srv_ip2, set_srv_ip2, store_u32_to_vec, load_vec_to_u32),
         (port1, set_port1, store_u16, load_u16),
         (port2, set_port2, store_u16, load_u16)
     ];
@@ -304,10 +322,10 @@ impl YamlIOable for msgcont::RdIntReg {
         (ip, set_ip, store_u32, load_u32),
         (board_mac, set_board_mac, store_u32, load_u32),
         (board_ip, set_board_ip, store_u32, load_u32),
-        (dst_mac1, set_dst_mac1, store_u64, load_u64),
-        (dst_ip1, set_dst_ip1, store_u32, load_u32),
-        (dst_mac2, set_dst_mac2, store_u64, load_u64),
-        (dst_ip2, set_dst_ip2, store_u32, load_u32),
+        (srv_mac1, set_srv_mac1, store_u64, load_u64),
+        (srv_ip1, set_srv_ip1, store_u32, load_u32),
+        (srv_mac2, set_srv_mac2, store_u64, load_u64),
+        (srv_ip2, set_srv_ip2, store_u32, load_u32),
         (port1, set_port1, store_u16, load_u16),
         (port2, set_port2, store_u16, load_u16),
         (serial, set_serial, store_u64, load_u64)

@@ -1,6 +1,6 @@
 use super::msgcont::{self, Decode};
 use std;
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum TrendMsg {
     Daq {
         content: msgcont::Daq,

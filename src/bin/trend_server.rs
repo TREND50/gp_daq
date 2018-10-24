@@ -1,17 +1,16 @@
 #![allow(unused_imports)]
 
+extern crate chrono;
 extern crate gp_daq;
 extern crate serde_yaml;
-extern crate chrono;
 use std::env;
 use std::fs::{File, OpenOptions};
 use std::io::Write;
 
-
 use chrono::offset::Utc;
 
-use gp_daq::io::yaml::YamlIOable;
 use gp_daq::io::event_file::{Event, FileHeader};
+use gp_daq::io::yaml::YamlIOable;
 use gp_daq::msg_def::msgcont::Ack_;
 use gp_daq::msg_def::TrendMsg;
 use gp_daq::net::client::send_msg;
@@ -72,13 +71,11 @@ fn main() {
         fh.write_to(&mut bin_file);
 
         server.register_handler(Box::new(move |msg, socket| {
-            let now=Utc::now();
+            let now = Utc::now();
 
-            let ip:Vec<i64>=
-            if let std::net::SocketAddr::V4(x)=socket{
-                x.ip().octets().iter().map(|&x|{x as i64}).collect()
-            }
-            else{
+            let ip: Vec<i64> = if let std::net::SocketAddr::V4(x) = socket {
+                x.ip().octets().iter().map(|&x| x as i64).collect()
+            } else {
                 panic!("Ipv6 is not supported")
             };
             match msg {
@@ -89,21 +86,23 @@ fn main() {
                     let ev = Event::from_trend_data(&content, &payload);
                     ev.write_to(&mut bin_file);
                     let mut v = msg.to_yaml();
-                    v["received_timestamp"]=From::from(vec![now.timestamp(),now.timestamp_subsec_nanos() as i64]);
-                    v["received_timestamp_str"]=From::from(now.to_string());
-                    v["source_ip"]=From::from(ip.clone());
+                    v["received_timestamp"] =
+                        From::from(vec![now.timestamp(), now.timestamp_subsec_nanos() as i64]);
+                    v["received_timestamp_str"] = From::from(now.to_string());
+                    v["source_ip"] = From::from(ip.clone());
                     serde_yaml::to_writer(&mut yaml_file, &v).expect("write failed");
                     write!(yaml_file, "\n");
                 }
-                &TrendMsg::Ack {..}=>(),
+                &TrendMsg::Ack { .. } => (),
                 &ref msg => {
                     let mut v = msg.to_yaml();
-                    v["received_timestamp"]=From::from(vec![now.timestamp(),now.timestamp_subsec_nanos() as i64]);
-                    v["received_timestamp_str"]=From::from(now.to_string());
-                    v["source_ip"]=From::from(ip.clone());
+                    v["received_timestamp"] =
+                        From::from(vec![now.timestamp(), now.timestamp_subsec_nanos() as i64]);
+                    v["received_timestamp_str"] = From::from(now.to_string());
+                    v["source_ip"] = From::from(ip.clone());
                     serde_yaml::to_writer(&mut yaml_file, &v).expect("write failed");
                     write!(yaml_file, "\n");
-                },
+                }
             }
             //msg.write_to_txt(&mut txt_file, &now).unwrap();
         }));
