@@ -43,7 +43,7 @@ fn main() {
                     std::net::SocketAddr::V4(std::net::SocketAddrV4::new(ip4, slc_port));
                 println!("ack sent");
                 println!("{}", back_addr.port());
-                send_msg(back_addr, TrendMsg::Ack { content: ack }, None);
+                let _ = send_msg(back_addr, TrendMsg::Ack { content: ack }, None);
             }
         }
     }));

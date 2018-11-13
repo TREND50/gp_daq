@@ -5,6 +5,7 @@ extern crate interfaces;
 extern crate pcap;
 extern crate serde_yaml;
 
+use gp_daq::net::net_err::NetErr;
 use pcap::Device;
 use std::io::Read;
 use std::str;
@@ -18,16 +19,17 @@ use std::env;
 use std::net::UdpSocket;
 
 use gp_daq::io::yaml::YamlIOable;
-use gp_daq::msg_def::msgcont::IntReg;
-use gp_daq::msg_def::TrendMsg;
+use gp_daq::msg_def::msg::TrendMsg;
+use gp_daq::msg_def::msgcont::IntReg_;
 use gp_daq::net::client::send_by_raw;
+use gp_daq::net::client::send_msg;
 
 fn u642mac(d: u64) -> [u8; 6] {
     let mut result = [0_u8; 6];
     for i in 0..6 {
         result[i] = (d >> ((5 - i) * 8) & 0xff) as u8;
     }
-    println!("{}\n{:?}", d, result);
+    //println!("{}\n{:?}", d, result);
     result
 }
 
@@ -67,7 +69,7 @@ fn main() {
             //println!("{:?}", v);
             let msg = gp_daq::msg_def::TrendMsg::from_yaml(&v);
             //send_msg(addr.clone(), msg, Some(monitor_port));
-            if let TrendMsg::IntReg { ref content } = msg {
+            if let TrendMsg::IntReg { .. } = msg {
                 let bmac = u642mac(v["board_mac"].as_u64().unwrap());
                 let bip: Vec<u8> = v["board_ip"]
                     .as_sequence()
@@ -77,12 +79,12 @@ fn main() {
                     .as_sequence()
                     .map(|x| x.iter().map(|x| x.as_u64().unwrap() as u8).collect())
                     .unwrap();
-                let srv_ip2: Vec<u8> = v["srv_ip2"]
+                let _srv_ip2: Vec<u8> = v["srv_ip2"]
                     .as_sequence()
                     .map(|x| x.iter().map(|x| x.as_u64().unwrap() as u8).collect())
                     .unwrap();
-                let port1 = v["port1"].as_u64().unwrap() as u16;
-                let port2 = v["port2"].as_u64().unwrap() as u16;
+                let _port1 = v["port1"].as_u64().unwrap() as u16;
+                let _port2 = v["port2"].as_u64().unwrap() as u16;
                 let mut src_mac = [0; 6];
                 for i in 0..6 {
                     src_mac[i] = mac_addr[i];
@@ -91,8 +93,8 @@ fn main() {
                     name: args[1].to_string(),
                     desc: None,
                 };
-                //println!("{:?}", bmac);
-                send_by_raw(
+                println!("setting board {:?}'s IP address to be {:?}", bmac, bip);
+                let _ = send_by_raw(
                     dev,
                     bmac,
                     src_mac,
@@ -105,10 +107,21 @@ fn main() {
                         port,
                     ),
                     msg.clone(),
-                    Some(monitor_port),
+                    None,
                 );
-
-                println!("{:?}", bip);
+                let mut intreg = IntReg_([0; 11]);
+                intreg.set_write(0);
+                match send_msg(
+                    (
+                        std::net::Ipv4Addr::new(bip[0], bip[1], bip[2], bip[3]),
+                        port,
+                    ),
+                    TrendMsg::IntReg { content: intreg },
+                    Some(monitor_port),
+                ) {
+                    Ok(..) => eprintln!("Ack received"),
+                    Err(x) => eprintln!("{:?}", x),
+                }
             } else {
                 println!("not intreg, skip");
             }

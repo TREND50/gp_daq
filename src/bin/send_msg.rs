@@ -41,7 +41,10 @@ fn main() {
         let _ = from_str::<Value>(s).map(|v| {
             //println!("{:?}", v);
             let daq1 = gp_daq::msg_def::TrendMsg::from_yaml(&v);
-            send_msg(addr.clone(), daq1, Some(monitor_port));
+            match send_msg(addr.clone(), daq1, Some(monitor_port)) {
+                Ok(..) => {}
+                Err(x) => println!("{:?}", x),
+            }
         });
     }
 }
