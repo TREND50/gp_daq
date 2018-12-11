@@ -52,7 +52,7 @@ fn main() {
         .expect("get mac addr failed")
         .as_bytes()
         .to_vec();
-    println!("host mac: {:?}", mac_addr);
+    println!("host mac: {:x?}", mac_addr);
 
     let mut f = File::open(env::args().nth(2).expect(&format!(
         "Usage: {} <yaml> <addr:port>",
@@ -94,7 +94,7 @@ fn main() {
                     name: args[1].to_string(),
                     desc: None,
                 };
-                println!("setting board {:?}'s IP address to be {:?}", bmac, bip);
+                println!("setting board {:x?}'s IP address to be {:?}", bmac, bip);
                 let _ = send_by_raw(
                     dev,
                     bmac,
