@@ -71,8 +71,18 @@ fn main() {
             let msg = gp_daq::msg_def::TrendMsg::from_yaml(&v);
             //send_msg(addr.clone(), msg, Some(monitor_port));
             if let TrendMsg::IntReg { .. } = msg {
-                println!("{:x?}", v["srv_mac1"].as_sequence().unwrap().iter().map(|x|{x.as_u64().unwrap()}).collect::<Vec<_>>());
-                println!("{:x?}", v["srv_mac2"].as_sequence().unwrap().iter().map(|x|{x.as_u64().unwrap()}).collect::<Vec<_>>());
+                let srv_mac1=u642mac(v["srv_mac1"].as_u64().expect("get host mac1 error"));
+                let srv_mac2=u642mac(v["srv_mac2"].as_u64().expect("get host mac2 error"));
+                if srv_mac1.iter().zip(mac_addr.iter()).any(|(&a,&b)|{a!=b}){
+                    eprintln!("*********WARNING!!!*********");
+                    eprintln!("Warning actual host mac addr mismatches the src_mac1 in cfg file: {:x?} vs {:x?}", mac_addr, srv_mac1);
+                }
+                if srv_mac2.iter().zip(mac_addr.iter()).any(|(&a,&b)|{a!=b}){
+                    eprintln!("*********WARNING!!!*********");
+                    eprintln!("Warning actual host mac addr mismatches the src_mac2 in cfg file: {:x?} vs {:x?}", mac_addr, srv_mac2);
+                }
+                //println!("{:x?}", v["srv_mac1"].as_sequence().unwrap().iter().map(|x|{x.as_u64().unwrap()}).collect::<Vec<_>>());
+                //println!("{:x?}", v["srv_mac2"].as_sequence().unwrap().iter().map(|x|{x.as_u64().unwrap()}).collect::<Vec<_>>());
                 let bmac = u642mac(v["board_mac"].as_u64().unwrap());
                 let bip: Vec<u8> = v["board_ip"]
                     .as_sequence()
