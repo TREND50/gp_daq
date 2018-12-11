@@ -2,9 +2,9 @@ msg_type: INTREG
 write: 1
 board_mac: 0x00071238804c
 board_ip: [ 192, 168, 1, 113 ]
-srv_mac1:  0xF01E34134AE1
-srv_ip1: [192, 168,  1,  111]
-srv_mac2:  0xF01E34134AE1
-srv_ip2: [192, 168,  1,  111]
+srv_mac1:  0x00e84c681bce
+srv_ip1: [192, 168,  1,  116]
+srv_mac2:  0x00e84c681bce
+srv_ip2: [192, 168,  1,  116]
 port1: 1236
 port2: 1235
