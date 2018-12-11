@@ -52,6 +52,7 @@ fn main() {
         .expect("get mac addr failed")
         .as_bytes()
         .to_vec();
+    println!("host mac: {:?}", mac_addr);
 
     let mut f = File::open(env::args().nth(2).expect(&format!(
         "Usage: {} <yaml> <addr:port>",
