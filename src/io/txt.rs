@@ -64,7 +64,7 @@ impl msg::TrendMsg {
                 for i in payload {
                     write!(write, "{} ", i)?;
                 }
-                writeln!(write);
+                writeln!(write).unwrap();
             }
             &msg::TrendMsg::Slc { ref content } => {
                 writeln!(write, "-----------------")?;

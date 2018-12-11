@@ -91,7 +91,7 @@ fn main() {
                     v["received_timestamp_str"] = From::from(now.to_string());
                     v["source_ip"] = From::from(ip.clone());
                     serde_yaml::to_writer(&mut yaml_file, &v).expect("write failed");
-                    write!(yaml_file, "\n");
+                    write!(yaml_file, "\n").unwrap();
                 }
                 &TrendMsg::Ack { .. } => (),
                 &ref msg => {
@@ -101,7 +101,7 @@ fn main() {
                     v["received_timestamp_str"] = From::from(now.to_string());
                     v["source_ip"] = From::from(ip.clone());
                     serde_yaml::to_writer(&mut yaml_file, &v).expect("write failed");
-                    write!(yaml_file, "\n");
+                    write!(yaml_file, "\n").unwrap();
                 }
             }
             //msg.write_to_txt(&mut txt_file, &now).unwrap();

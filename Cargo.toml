@@ -1,12 +1,12 @@
 [dependencies]
 bitfield = '0.13.1'
-bytes = '0.4.10'
+bytes = '0.4.11'
 chrono = '0.4.6'
-etherparse = '0.7.0'
+etherparse = '0.7.1'
 interfaces = '0.0.4'
 pcap = '0.7.0'
-serde_yaml = '0.8.7'
-tokio = '0.1.11'
+serde_yaml = '0.8.8'
+tokio = '0.1.13'
 
 [package]
 authors = ['Gu Junhua <jhgu@nao.cas.cn>']
