@@ -28,7 +28,8 @@ fn main() {
     let mut f = File::open(env::args().nth(1).expect(&format!(
         "Usage: {} <yaml> <addr:port>",
         env::args().nth(0).unwrap()
-    ))).expect("Cannot open file");
+    )))
+    .expect("Cannot open file");
     let addr = env::args().nth(2).expect("Invalid addr");
 
     let monitor_port: u16 = args[3].parse().expect("invalid monitor port");

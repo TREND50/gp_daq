@@ -131,8 +131,8 @@ pub fn load_temp(data: &Value, k: &str) -> Option<u16> {
         load_u16(data, k)
     } else if data[k].is_f64() {
         let temp = data[k].as_f64().unwrap();
-        let sign: u16 = if temp < 0. { 0b1000000000000 } else { 0 };
-        let mut x12 = (temp.abs() / 0.0625) as u16 & 0b111111111111;
+        let sign: u16 = if temp < 0. { (1_u16) << 13 } else { 0 };
+        let mut x12 = (temp.abs() / 0.0625) as u16 & ((1_u16 << 13) - 1);
         if sign != 0 {
             x12 = !x12;
         }
@@ -179,10 +179,10 @@ pub fn store_th(data: &mut Value, k: &str, v: u16) {
 }
 
 pub fn store_temp(data: &mut Value, k: &str, v: u16) {
-    let sign = v & 0b1000000000000;
-    let mut x12 = v & 0b111111111111;
+    let sign = v & (1_u16 << 13);
+    let mut x12 = v & ((1_u16 << 13) - 1);
     if sign != 0 {
-        x12 = (!x12) & 0b111111111111;
+        x12 = (!x12) & ((1_u16 << 13) - 1);
     }
     data[k] = From::from(if sign != 0 {
         -(x12 as f64) * 0.0625

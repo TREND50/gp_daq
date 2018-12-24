@@ -17,7 +17,7 @@ where
     fn decode(&[u32]) -> Option<Self>;
 }
 
-bitfield!{
+bitfield! {
     #[repr(C)]
     #[derive(Default, Clone)]
     pub struct Daq_([u32]);
@@ -48,7 +48,7 @@ impl Decode for Daq {
     }
 }
 
-bitfield!{
+bitfield! {
 
     #[repr(C)]
     #[derive(Default, Clone)]
@@ -76,23 +76,28 @@ impl Decode for Trig {
     fn decode(data: &[u32]) -> Option<Self> {
         let mut result = [0_u32; 4];
         match data[0] & 0x80_00_00 {
-            1 => if data.len() < 1 {
-                None
-            } else {
-                result[0] = data[0];
-                Some(result)
-            },
-            _ => if data.len() < 4 {
-                None
-            } else {
-                result.copy_from_slice(&data[..4]);
-                Some(result)
-            },
-        }.map(|x| Trig_(x))
+            1 => {
+                if data.len() < 1 {
+                    None
+                } else {
+                    result[0] = data[0];
+                    Some(result)
+                }
+            }
+            _ => {
+                if data.len() < 4 {
+                    None
+                } else {
+                    result.copy_from_slice(&data[..4]);
+                    Some(result)
+                }
+            }
+        }
+        .map(|x| Trig_(x))
     }
 }
 
-bitfield!{
+bitfield! {
     #[repr(C)]
     #[derive(Default, Clone)]
     pub struct Gps_([u32]);
@@ -115,7 +120,7 @@ impl Decode for Gps {
     }
 }
 
-bitfield!{
+bitfield! {
     #[repr(C)]
     #[derive(Default, Clone)]
     pub struct Adc_([u32]);
@@ -137,7 +142,7 @@ impl Decode for Adc {
     }
 }
 
-bitfield!{
+bitfield! {
     #[repr(C)]
     #[derive(Default, Clone)]
     pub struct IntReg_([u32]);
@@ -165,19 +170,22 @@ impl Decode for IntReg {
             None
         } else {
             match data[0] & 1 {
-                1 => if data.len() < 11 {
-                    None
-                } else {
-                    result.copy_from_slice(&data[..11]);
-                    Some(result)
-                },
+                1 => {
+                    if data.len() < 11 {
+                        None
+                    } else {
+                        result.copy_from_slice(&data[..11]);
+                        Some(result)
+                    }
+                }
                 _ => Some(result),
             }
-        }.map(|x| IntReg_(x))
+        }
+        .map(|x| IntReg_(x))
     }
 }
 
-bitfield!{
+bitfield! {
     #[repr(C)]
     #[derive(Default, Clone)]
     pub struct Data_([u32]);
@@ -204,7 +212,7 @@ impl Decode for Data {
     }
 }
 
-bitfield!{
+bitfield! {
     #[repr(C)]
     #[derive(Default, Clone)]
     pub struct Slc_([u32]);
@@ -251,7 +259,7 @@ impl Decode for Slc {
     }
 }
 
-bitfield!{
+bitfield! {
     #[repr(C)]
     #[derive(Default, Clone)]
     pub struct RdIntReg_([u32]);
@@ -285,7 +293,7 @@ impl Decode for RdIntReg {
     }
 }
 
-bitfield!{
+bitfield! {
     #[repr(C)]
     #[derive(Default, Clone)]
     pub struct Ack_([u32]);

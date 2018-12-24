@@ -1,50 +1,53 @@
-#!/bin/bash
+#!/bin/sh
 
 SELF_PATH=`realpath $0`
 SELF_DIR=`dirname $SELF_PATH`
-CFG_DIR=$SELF_DIR/../cfgs
+PROG_DIR=$SELF_DIR/../target/release/
+CFG_DIR=${SELF_DIR}/../cfgs
 
-DAQ_DIR=$SELF_DIR/../
-
-if [ "x$DATADIR" = x ]
-then
-    echo "set DATADIR first"
-    exit
-fi
-
-
-if [ $# != 1 ]
-then
-    echo "Usage:" $0 "<board ID>"
-    exit
-fi
-
-MON_PORT=6666
 # Configuration
-BOARDID=$1
-if [ -f $DATADIR/last_run.txt ]
-then
-:
-else
-    echo 0 > $DATADIR/last_run.txt
-fi
-
-
+#BOARDID=$1
 NRUN=$(<$DATADIR/last_run.txt)
 NRUN=$(($NRUN+1))
 
 # Clean
-tmux kill-window -t "w"  
-# Execute run
-${SELF_DIR}/run.sh  1236 192.168.1.1${BOARDID} ${CFG_DIR}/minbias.yaml  $DATADIR/M$NRUN'_b'$BOARDID.data "w" 1
-#for i in {1..1000}
+tmux kill-window -t "wmb"  
+
+cat boardsIn.txt | while read BOARDID
+do
+  echo   $SELF_DIR/run.sh  1236 192.168.1.1${BOARDID} ${CFG_DIR}/minbias.yaml $DATADIR/M$NRUN.data "wmb" 500
+  $SELF_DIR/run.sh  1236 192.168.1.1${BOARDID} ${CFG_DIR}/minbias.yaml $DATADIR/M$NRUN.data "wmb" 500
+  sleep 1
+  $SELF_DIR/run.sh  1235 192.168.1.1${BOARDID} ${CFG_DIR}/slcreq.yaml $DATADIR/S$NRUN'_b'$BOARDID.data "wslc" 0
+done
+
+#BOARDID=09
+#$SELF_DIR/run.sh  1236 192.168.1.1${BOARDID} minbias.cfg $DATADIR/M$NRUN'_b'$BOARDID.data "wmb" 500
+#BOARDID=10
+#$SELF_DIR/run.sh  1236 192.168.1.1${BOARDID} minbias.cfg $DATADIR/M$NRUN'_b'$BOARDID.data "wmb" 500
+#BOARDID=11
+#$SELF_DIR/run.sh  1236 192.168.1.1${BOARDID} minbias.cfg $DATADIR/M$NRUN'_b'$BOARDID.data "wmb" 500
+#BOARDID=25
+#$SELF_DIR/run.sh  1236 192.168.1.1${BOARDID} minbias.cfg $DATADIR/M$NRUN'_b'$BOARDID.data "wmb" 500
+#BOARDID=27
+#$SELF_DIR/run.sh  1236 192.168.1.1${BOARDID} minbias.cfg $DATADIR/M$NRUN'_b'$BOARDID.data "wmb" 500
+#BOARDID=31
+#$SELF_DIR/run.sh  1236 192.168.1.1${BOARDID} minbias.cfg $DATADIR/M$NRUN'_b'$BOARDID.data "wmb" 50
+
+
+#for i in {1..500}
 #do 
 #  echo 'Event' $i
+#  # Execute run
+#  $SELF_DIR/run.sh  1236 192.168.1.1${BOARDID} minbias.cfg $DATADIR/M$NRUN'_b'$BOARDID.data "wmb" 0
 #done
 
 # Log run id
-cp $CFG_DIR/minbias.yaml  $DATADIR/M$NRUN'_b'$BOARDID.yaml
+cp minbias.cfg  $DATADIR/M$NRUN'_b'$BOARDID.cfg
 rm $DATADIR/last_run.txt
 echo $NRUN >> $DATADIR/last_run.txt
-echo "Now killing tmux window w." 
-tmux kill-window -t "w"
+echo "Now killing tmux window wmb." 
+tmux kill-window -t "wmb"
+echo "Now killing tmux window wslc." 
+tmux kill-window -t "wslc"
+
