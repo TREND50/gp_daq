@@ -20,7 +20,7 @@ use gp_daq::net::server::TrendServer;
 //use gp_daq::io::txt;
 
 fn main() {
-    let args: Vec<_> = std::env::args().into_iter().collect();
+    let args: Vec<_> = std::env::args().collect();
     if args.len() < 3 {
         eprintln!(
             "Usage: {} <addr:port> <monitor port> [out file prefix]",
@@ -74,12 +74,12 @@ fn main() {
             let now = Utc::now();
 
             let ip: Vec<i64> = if let std::net::SocketAddr::V4(x) = socket {
-                x.ip().octets().iter().map(|&x| x as i64).collect()
+                x.ip().octets().iter().map(|&x|i64::from(x)).collect()
             } else {
                 panic!("Ipv6 is not supported")
             };
-            match msg {
-                &TrendMsg::Data {
+            match *msg {
+                TrendMsg::Data {
                     ref content,
                     ref payload,
                 } => {
@@ -87,21 +87,21 @@ fn main() {
                     ev.write_to(&mut bin_file);
                     let mut v = msg.to_yaml();
                     v["received_timestamp"] =
-                        From::from(vec![now.timestamp(), now.timestamp_subsec_nanos() as i64]);
+                        From::from(vec![now.timestamp(), i64::from(now.timestamp_subsec_nanos())]);
                     v["received_timestamp_str"] = From::from(now.to_string());
                     v["source_ip"] = From::from(ip.clone());
                     serde_yaml::to_writer(&mut yaml_file, &v).expect("write failed");
-                    write!(yaml_file, "\n").unwrap();
+                    writeln!(yaml_file).unwrap();
                 }
-                &TrendMsg::Ack { .. } => (),
-                &ref msg => {
+                TrendMsg::Ack { .. } => (),
+                ref msg => {
                     let mut v = msg.to_yaml();
                     v["received_timestamp"] =
-                        From::from(vec![now.timestamp(), now.timestamp_subsec_nanos() as i64]);
+                        From::from(vec![now.timestamp(), i64::from(now.timestamp_subsec_nanos())]);
                     v["received_timestamp_str"] = From::from(now.to_string());
                     v["source_ip"] = From::from(ip.clone());
                     serde_yaml::to_writer(&mut yaml_file, &v).expect("write failed");
-                    write!(yaml_file, "\n").unwrap();
+                    writeln!(yaml_file).unwrap();
                 }
             }
             //msg.write_to_txt(&mut txt_file, &now).unwrap();

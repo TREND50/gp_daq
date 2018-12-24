@@ -29,7 +29,7 @@ trait ToByteStream: Default + Sized {
     }
 }
 
-fn write_vec_to<T: Sized, W: Write>(data: &Vec<T>, writer: &mut W) {
+fn write_vec_to<T: Sized, W: Write>(data: &[T], writer: &mut W) {
     let t_size = std::mem::size_of::<T>();
     let len = data.len();
     let raw = unsafe { std::slice::from_raw_parts(data.as_ptr() as *const u8, t_size * len) };
@@ -179,8 +179,8 @@ impl EventHeader {
             eventnr: cont.event_count() as u32,
             t3eventnr: 0,
             first_ls: 0,
-            event_sec: cont.sss() as u32,
-            event_nsec: ((4 * cont.ts2() + cont.ts1pps() as u32 - cont.ts1trigger() as u32) as f64
+            event_sec: u32::from(cont.sss()),
+            event_nsec: (f64::from(4 * cont.ts2() + u32::from(cont.ts1pps()) - u32::from(cont.ts1trigger()))
                 * 2.1) as u32,
             event_type: 0,
             event_vers: 0,
@@ -247,11 +247,10 @@ impl LocalStationHeader {
             event_nr: cont.event_count() as u16,
             ls_id: (cont.ip() & 0xffff) as u16,
             header_length: 0,
-            gps_seconds: cont.sss() as u32,
-            gps_nanoseconds: ((4 * cont.ts2() + cont.ts1pps() as u32 - cont.ts1trigger() as u32)
-                as f64
+            gps_seconds: u32::from(cont.sss()),
+            gps_nanoseconds: (f64::from(4 * cont.ts2() + u32::from(cont.ts1pps()) - u32::from(cont.ts1trigger()))
                 * 2.1) as u32,
-            trigger_flag: cont.trig_pattern() as u16,
+            trigger_flag: u16::from(cont.trig_pattern()),
             trigger_pos: 0,
             sampling_freq: 0,
             channel_mask: 0,
@@ -320,8 +319,8 @@ impl LocalStation {
     pub fn new(lsh: LocalStationHeader, header_data: Vec<u16>, adc_buffer: Vec<u16>) -> Self {
         let mut result = LocalStation {
             header: lsh,
-            header_data: header_data,
-            adc_buffer: adc_buffer,
+            header_data,
+            adc_buffer,
         };
         result.header.length = result.size() as u16 / 2;
         result.header.header_length = result.header_data.len() as u16 + 13;
@@ -337,8 +336,8 @@ impl LocalStation {
                 if let Some(adc_buffer) = read_vec_from(reader, dl) {
                     Some(LocalStation {
                         header: h,
-                        header_data: header_data,
-                        adc_buffer: adc_buffer,
+                        header_data,
+                        adc_buffer,
                     })
                 } else {
                     None
@@ -400,11 +399,11 @@ impl Event {
         self.header.header_length = self.size() as u32 - 4;
     }
 
-    pub fn from_trend_data(cont: &Data, adc_buffer: &Vec<u16>) -> Self {
+    pub fn from_trend_data(cont: &Data, adc_buffer: &[u16]) -> Self {
         let ls = LocalStation::new(
             LocalStationHeader::from_trend_data(cont),
             vec![],
-            adc_buffer.clone(),
+            adc_buffer.to_owned(),
         );
         let eh = EventHeader::from_trend_data(cont);
         let mut ev = Event::new(eh);

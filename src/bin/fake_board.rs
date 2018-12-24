@@ -15,7 +15,7 @@ use gp_daq::net::client::send_msg;
 use gp_daq::net::server::TrendServer;
 
 fn main() {
-    let args: Vec<_> = std::env::args().into_iter().collect();
+    let args: Vec<_> = std::env::args().collect();
     if args.len() < 3 {
         eprintln!("Usage: {} <addr:port> <controller slc port>", args[0]);
         return;

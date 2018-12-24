@@ -1,3 +1,4 @@
+#![allow(clippy::needless_pass_by_value)]
 use super::super::msg_def::TrendMsg;
 use super::server::TrendServer;
 use crate::net::net_err::NetErr;
@@ -7,7 +8,7 @@ use std;
 use std::net::{SocketAddr, ToSocketAddrs, UdpSocket};
 use std::time::Duration;
 
-const TIMEOUT: u32 = 500000000;
+const TIMEOUT: u32 = 500_000_000;
 
 pub fn send_msg(
     addr: impl ToSocketAddrs + Send + 'static,
@@ -96,7 +97,7 @@ pub fn send_by_raw(
 
         let j = std::thread::spawn(move || {
             std::thread::sleep(Duration::new(0, TIMEOUT));
-            let _ = cap.sendpacket(&data[..]).expect("send data failed");
+            cap.sendpacket(&data[..]).expect("send data failed");
         });
         let result = if let Some(msg) = server.wait_for(Some(Duration::new(1, 0))) {
             match msg {
@@ -112,7 +113,7 @@ pub fn send_by_raw(
         let _ = j.join();
         result
     } else {
-        let _ = cap.sendpacket(&data[..]).expect("send data failed");
+        cap.sendpacket(&data[..]).expect("send data failed");
         Ok(())
     }
 }

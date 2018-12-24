@@ -1,3 +1,4 @@
+#![allow(clippy::identity_op)]
 //use bitfield::*;
 
 pub type Daq = Daq_<[u32; 2]>;
@@ -77,7 +78,7 @@ impl Decode for Trig {
         let mut result = [0_u32; 4];
         match data[0] & 0x80_00_00 {
             1 => {
-                if data.len() < 1 {
+                if data.is_empty() {
                     None
                 } else {
                     result[0] = data[0];
@@ -93,7 +94,7 @@ impl Decode for Trig {
                 }
             }
         }
-        .map(|x| Trig_(x))
+        .map(Trig_)
     }
 }
 
@@ -111,7 +112,7 @@ bitfield! {
 impl Decode for Gps {
     fn decode(data: &[u32]) -> Option<Self> {
         let mut result = [0_u32; 1];
-        if data.len() < 1 {
+        if data.is_empty() {
             None
         } else {
             result.copy_from_slice(&data[..1]);
@@ -133,7 +134,7 @@ bitfield! {
 impl Decode for Adc {
     fn decode(data: &[u32]) -> Option<Self> {
         let mut result = [0_u32; 1];
-        if data.len() < 1 {
+        if data.is_empty() {
             None
         } else {
             result.copy_from_slice(&data[..1]);
@@ -166,7 +167,7 @@ bitfield! {
 impl Decode for IntReg {
     fn decode(data: &[u32]) -> Option<Self> {
         let mut result = [0_u32; 11];
-        if data.len() < 1 {
+        if data.is_empty() {
             None
         } else {
             match data[0] & 1 {
@@ -181,7 +182,7 @@ impl Decode for IntReg {
                 _ => Some(result),
             }
         }
-        .map(|x| IntReg_(x))
+        .map(IntReg_)
     }
 }
 

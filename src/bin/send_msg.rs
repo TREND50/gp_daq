@@ -25,10 +25,7 @@ fn main() {
         return;
     }
 
-    let mut f = File::open(env::args().nth(1).expect(&format!(
-        "Usage: {} <yaml> <addr:port>",
-        env::args().nth(0).unwrap()
-    )))
+    let mut f = File::open(env::args().nth(1).unwrap_or_else(|| panic!("Usage: {} <yaml> <addr:port>", env::args().nth(0).unwrap())))
     .expect("Cannot open file");
     let addr = env::args().nth(2).expect("Invalid addr");
 

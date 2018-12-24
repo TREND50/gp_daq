@@ -1,3 +1,5 @@
+#![allow(clippy::block_in_if_condition_stmt)]
+#![allow(clippy::needless_range_loop)]
 #![allow(unused_imports)]
 
 extern crate gp_daq;
@@ -54,10 +56,7 @@ fn main() {
         .to_vec();
     println!("host mac: {:x?}", mac_addr);
 
-    let mut f = File::open(env::args().nth(2).expect(&format!(
-        "Usage: {} <yaml> <addr:port>",
-        env::args().nth(0).unwrap()
-    )))
+    let mut f = File::open(env::args().nth(2).unwrap_or_else(|| panic!("Usage: {} <yaml> <addr:port>", env::args().nth(0).unwrap())))
     .expect("Cannot open file");
 
     let monitor_port: u16 = args[4].parse().expect("invalid monitor port");
@@ -100,9 +99,7 @@ fn main() {
                 let _port1 = v["port1"].as_u64().unwrap() as u16;
                 let _port2 = v["port2"].as_u64().unwrap() as u16;
                 let mut src_mac = [0; 6];
-                for i in 0..6 {
-                    src_mac[i] = mac_addr[i];
-                }
+                src_mac[..6].clone_from_slice(&mac_addr[..6]);
                 let dev = Device {
                     name: args[1].to_string(),
                     desc: None,

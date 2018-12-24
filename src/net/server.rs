@@ -27,14 +27,12 @@ impl TrendServer {
             unsafe { buf.set_len(s) };
             //println!("{}", buf.len());
 
-            match TrendMsg::from_byte_vec(buf) {
-                Some(ref msg) => {
+            if let Some(ref msg)= TrendMsg::from_byte_vec(buf)
+                {
                     for h in &mut self.handlers {
                         h(&msg, addr);
                     }
                 }
-                _ => (),
-            }
         }
     }
 
@@ -55,7 +53,7 @@ impl TrendServer {
 
     pub fn new(addr: SocketAddr) -> Self {
         TrendServer {
-            socket: UdpSocket::bind(&addr).expect(&format!("bind to addr {} failed", addr)),
+            socket: UdpSocket::bind(&addr).unwrap_or_else(|_| panic!("bind to addr {} failed", addr)),
             handlers: Vec::new(),
         }
     }

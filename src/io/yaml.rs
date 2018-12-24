@@ -44,8 +44,7 @@ pub fn load_str(data: &Value, k: &str) -> Option<String> {
 
 pub fn str2u64(s: &str) -> Option<u64> {
     let r = if s.len() <= 2 {
-        let a = u64::from_str_radix(s, 10);
-        a
+        u64::from_str_radix(s, 10)
     } else if &s[0..2] == "0b" || &s[0..2] == "0B" {
         u64::from_str_radix(&s[2..], 2)
     } else if &s[0..2] == "0x" || &s[0..2] == "0X" {
@@ -97,7 +96,7 @@ pub fn load_vpower1456(data: &Value, k: &str) -> Option<u16> {
         load_u16(data, k)
     } else if data[k].is_f64() {
         let vp = data[k].as_f64().unwrap();
-        Some((vp / 5.0 * 2.0 / 24.0 * ((1_u16 << 12) as f64)) as u16)
+        Some((vp / 5.0 * 2.0 / 24.0 * f64::from(1_u16 << 12)) as u16)
     } else {
         None
     }
@@ -109,7 +108,7 @@ pub fn load_vpower23(data: &Value, k: &str) -> Option<u16> {
         load_u16(data, k)
     } else if data[k].is_f64() {
         let vp = data[k].as_f64().unwrap();
-        Some((vp / 5.0 * 2.2 / 6.9 * ((1_u16 << 12) as f64)) as u16)
+        Some((vp / 5.0 * 2.2 / 6.9 * f64::from(1_u16 << 12)) as u16)
     } else {
         None
     }
@@ -159,7 +158,7 @@ pub fn store_u8(data: &mut Value, k: &str, v: u8) {
 }
 
 pub fn store_vpower1456(data: &mut Value, k: &str, v: u16) {
-    data[k] = From::from(v as f64 / ((1_u16 << 12) as f64) * 24.0 / 2.0 * 5.0);
+    data[k] = From::from(f64::from(v) / f64::from(1_u16 << 12) * 24.0 / 2.0 * 5.0);
 }
 
 pub fn store_u32_to_vec(data: &mut Value, k: &str, v: u32) {
@@ -171,11 +170,11 @@ pub fn store_u32_to_vec(data: &mut Value, k: &str, v: u32) {
 }
 
 pub fn store_vpower23(data: &mut Value, k: &str, v: u16) {
-    data[k] = From::from(v as f64 / ((1_u16 << 12) as f64) * 6.9 / 2.2 * 5.0);
+    data[k] = From::from(f64::from(v) / f64::from(1_u16 << 12) * 6.9 / 2.2 * 5.0);
 }
 
 pub fn store_th(data: &mut Value, k: &str, v: u16) {
-    data[k] = From::from(v as f64 * 0.5);
+    data[k] = From::from(f64::from(v) * 0.5);
 }
 
 pub fn store_temp(data: &mut Value, k: &str, v: u16) {
@@ -185,9 +184,9 @@ pub fn store_temp(data: &mut Value, k: &str, v: u16) {
         x12 = (!x12) & ((1_u16 << 13) - 1);
     }
     data[k] = From::from(if sign != 0 {
-        -(x12 as f64) * 0.0625
+        -f64::from(x12) * 0.0625
     } else {
-        x12 as f64 * 0.0625
+        f64::from(x12) * 0.0625
     })
 }
 
@@ -390,21 +389,21 @@ impl YamlIOable for msg::TrendMsg {
     }
 
     fn to_yaml(&self) -> Value {
-        let mut result = match self {
-            &msg::TrendMsg::Daq { ref content } => content.to_yaml(),
-            &msg::TrendMsg::Trig { ref content } => content.to_yaml(),
-            &msg::TrendMsg::SlcReq { .. } => From::from(Mapping::new()),
-            &msg::TrendMsg::Gps {
+        let mut result = match *self {
+            msg::TrendMsg::Daq { ref content } => content.to_yaml(),
+            msg::TrendMsg::Trig { ref content } => content.to_yaml(),
+            msg::TrendMsg::SlcReq { .. } => From::from(Mapping::new()),
+            msg::TrendMsg::Gps {
                 ref content,
                 ref payload,
             } => {
                 let mut x = content.to_yaml();
-                x["data"] = From::<Vec<u16>>::from(payload.iter().map(|&x| x as u16).collect());
+                x["data"] = From::<Vec<u16>>::from(payload.iter().map(|&x| u16::from(x)).collect());
                 x
             }
-            &msg::TrendMsg::Adc { ref content } => content.to_yaml(),
-            &msg::TrendMsg::IntReg { ref content, .. } => content.to_yaml(),
-            &msg::TrendMsg::Data {
+            msg::TrendMsg::Adc { ref content } => content.to_yaml(),
+            msg::TrendMsg::IntReg { ref content, .. } => content.to_yaml(),
+            msg::TrendMsg::Data {
                 ref content,
                 ref payload,
             } => {
@@ -412,9 +411,9 @@ impl YamlIOable for msg::TrendMsg {
                 x["data"] = From::from(payload.clone());
                 x
             }
-            &msg::TrendMsg::Slc { ref content, .. } => content.to_yaml(),
-            &msg::TrendMsg::RdIntReg { ref content, .. } => content.to_yaml(),
-            &msg::TrendMsg::Ack { ref content, .. } => content.to_yaml(),
+            msg::TrendMsg::Slc { ref content, .. } => content.to_yaml(),
+            msg::TrendMsg::RdIntReg { ref content, .. } => content.to_yaml(),
+            msg::TrendMsg::Ack { ref content, .. } => content.to_yaml(),
         };
         result["msg_type"] = From::from(self.type_name());
         result
