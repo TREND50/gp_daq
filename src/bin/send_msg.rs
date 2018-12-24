@@ -42,7 +42,7 @@ fn main() {
             //println!("{:?}", v);
             let daq1 = gp_daq::msg_def::TrendMsg::from_yaml(&v);
             match send_msg(addr.clone(), daq1, Some(monitor_port)) {
-                Ok(..) => {}
+                Ok(..) => println!("Corresponding Ack received"),
                 Err(x) => println!("{:?}", x),
             }
         });
