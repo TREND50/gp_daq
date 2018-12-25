@@ -11,14 +11,16 @@ NRUN=$(<$DATADIR/last_run.txt)
 NRUN=$(($NRUN+1))
 
 # Clean
-tmux kill-window -t "wmb"  
+tmux kill-window -t "minbias"  
+
+${SELF_DIR}/run_server.sh 1235 1236 $DATADIR/M$NRUN.data "minbias"
 
 cat boardsIn.txt | while read BOARDID
 do
-  echo   $SELF_DIR/run.sh  1236 192.168.1.1${BOARDID} ${CFG_DIR}/minbias.yaml $DATADIR/M$NRUN.data "wmb" 500
-  $SELF_DIR/run.sh  1236 192.168.1.1${BOARDID} ${CFG_DIR}/minbias.yaml $DATADIR/M$NRUN.data "wmb" 500
+  ${PROG_DIR}/send_msg ${CFG_DIR}/minbias.yaml 192.168.1.1${BOARDID}:1234 8888
   sleep 1
-  $SELF_DIR/run.sh  1235 192.168.1.1${BOARDID} ${CFG_DIR}/slcreq.yaml $DATADIR/S$NRUN'_b'$BOARDID.data "wslc" 0
+  #$SELF_DIR/run.sh  1235 1236 192.168.1.1${BOARDID} ${CFG_DIR}/slcreq.yaml $DATADIR/S$NRUN'_b'$BOARDID.data "wslc" 0
+  ${PROG_DIR}/send_msg ${CFG_DIR}/slcreq.yaml 192.168.1.1${BOARDID}:1234 8888
 done
 
 #BOARDID=09
@@ -43,11 +45,8 @@ done
 #done
 
 # Log run id
-cp minbias.cfg  $DATADIR/M$NRUN'_b'$BOARDID.cfg
+cp ${CFG_DIR}/minbias.yaml  $DATADIR/M$NRUN'_b'$BOARDID.yaml
 rm $DATADIR/last_run.txt
 echo $NRUN >> $DATADIR/last_run.txt
-echo "Now killing tmux window wmb." 
-tmux kill-window -t "wmb"
-echo "Now killing tmux window wslc." 
-tmux kill-window -t "wslc"
-
+echo "Now killing tmux window minbias." 
+tmux kill-window -t "minbias"
