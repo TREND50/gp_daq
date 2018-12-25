@@ -180,8 +180,9 @@ impl EventHeader {
             t3eventnr: 0,
             first_ls: 0,
             event_sec: u32::from(cont.sss()),
-            event_nsec: (f64::from(4 * cont.ts2() + u32::from(cont.ts1pps()) - u32::from(cont.ts1trigger()))
-                * 2.1) as u32,
+            event_nsec: (f64::from(
+                4 * cont.ts2() + u32::from(cont.ts1pps()) - u32::from(cont.ts1trigger()),
+            ) * 2.1) as u32,
             event_type: 0,
             event_vers: 0,
             ad1: 0,
@@ -248,8 +249,9 @@ impl LocalStationHeader {
             ls_id: (cont.ip() & 0xffff) as u16,
             header_length: 0,
             gps_seconds: u32::from(cont.sss()),
-            gps_nanoseconds: (f64::from(4 * cont.ts2() + u32::from(cont.ts1pps()) - u32::from(cont.ts1trigger()))
-                * 2.1) as u32,
+            gps_nanoseconds: (f64::from(
+                4 * cont.ts2() + u32::from(cont.ts1pps()) - u32::from(cont.ts1trigger()),
+            ) * 2.1) as u32,
             trigger_flag: u16::from(cont.trig_pattern()),
             trigger_pos: 0,
             sampling_freq: 0,
@@ -277,14 +279,12 @@ impl Display for LocalStationHeader {
                                                     f,
                                                     "adc_resolution: {}",
                                                     self.adc_resolution
-                                                )
-                                                .and(
+                                                ).and(
                                                     writeln!(
                                                         f,
                                                         "trace_length: {}",
                                                         self.trace_length
-                                                    )
-                                                    .and(writeln!(f, "version: {}", self.version)),
+                                                    ).and(writeln!(f, "version: {}", self.version)),
                                                 ),
                                             ),
                                         ),

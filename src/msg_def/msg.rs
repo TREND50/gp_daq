@@ -199,10 +199,14 @@ impl TrendMsg {
         if word_cap * 4 != data.len() {
             return None;
         }
-        assert!(data.len()%4==0);
-        let temp_vec=vec![0_u32;data.len()/4];
-        let ptr_temp_vec=unsafe{std::slice::from_raw_parts_mut(temp_vec.as_ptr() as *mut u8, data.len())};
-        ptr_temp_vec.iter_mut().zip(data.into_iter()).for_each(|(a,b)|{*a=b});
+        assert!(data.len() % 4 == 0);
+        let temp_vec = vec![0_u32; data.len() / 4];
+        let ptr_temp_vec =
+            unsafe { std::slice::from_raw_parts_mut(temp_vec.as_ptr() as *mut u8, data.len()) };
+        ptr_temp_vec
+            .iter_mut()
+            .zip(data.into_iter())
+            .for_each(|(a, b)| *a = b);
 
         Self::from_word_vec(temp_vec)
     }

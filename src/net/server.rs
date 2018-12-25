@@ -11,11 +11,11 @@ use tokio::prelude::Stream;
 
 pub struct TrendServer {
     socket: UdpSocket,
-    handlers: Vec<Box<FnMut(&TrendMsg, std::net::SocketAddr) -> ()>>,
+    handlers: Vec<Box<dyn FnMut(&TrendMsg, std::net::SocketAddr) -> ()+Send+Sync>>,
 }
 
 impl TrendServer {
-    pub fn register_handler(&mut self, h: Box<FnMut(&TrendMsg, std::net::SocketAddr) -> ()>) {
+    pub fn register_handler(&mut self, h: Box<dyn FnMut(&TrendMsg, std::net::SocketAddr) -> ()+Send+Sync>) {
         self.handlers.push(h);
     }
 
@@ -27,12 +27,11 @@ impl TrendServer {
             unsafe { buf.set_len(s) };
             //println!("{}", buf.len());
 
-            if let Some(ref msg)= TrendMsg::from_byte_vec(buf)
-                {
-                    for h in &mut self.handlers {
-                        h(&msg, addr);
-                    }
+            if let Some(ref msg) = TrendMsg::from_byte_vec(buf) {
+                for h in &mut self.handlers {
+                    h(&msg, addr);
                 }
+            }
         }
     }
 
@@ -53,7 +52,8 @@ impl TrendServer {
 
     pub fn new(addr: SocketAddr) -> Self {
         TrendServer {
-            socket: UdpSocket::bind(&addr).unwrap_or_else(|_| panic!("bind to addr {} failed", addr)),
+            socket: UdpSocket::bind(&addr)
+                .unwrap_or_else(|_| panic!("bind to addr {} failed", addr)),
             handlers: Vec::new(),
         }
     }
