@@ -2,8 +2,8 @@
 
 SELF_PATH=`realpath $0`
 SELF_DIR=`dirname $SELF_PATH`
+PROG_DIR=$SELF_DIR/../target/release/
 CFG_DIR=$SELF_DIR/../cfgs
-DAQ_DIR=$SELF_DIR/../
 
 if [ "x$DATADIR" = x ]
 then
