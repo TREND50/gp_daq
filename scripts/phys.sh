@@ -37,7 +37,7 @@ python $SELF_DIR/fill_phys_yaml.py ${CFG_DIR}/physgen.yaml $2 $3 $4 $5 $6 $7 $8 
 # Clean
 tmux kill-window -t "w"
 # Execute run
-$SELF_DIR/run.sh  1236 192.168.1.1${BOARDID} $DATADIR/phys${NRUN}.yaml $DATADIR/R$NRUN'_b'$BOARDID.data "w" 0
+$SELF_DIR/run.sh  1235 1236 192.168.1.1${BOARDID} $DATADIR/phys${NRUN}.yaml $DATADIR/R$NRUN'_b'$BOARDID.data "w" 0
 
 # Log run id
 mv $DATADIR/phys${NRUN}.yaml  $DATADIR/R$NRUN'_b'$BOARDID.yaml
