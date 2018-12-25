@@ -1,23 +1,25 @@
 #!/bin/sh
 
-if [ $# != 6 ]
-then
-    echo "Usage:" $0 "  <server port> <board ip> <cfg> <dump file> <session name> <loop>"
-    exit
-fi
-
 SELF_PATH=`realpath $0`
 SELF_DIR=`dirname $SELF_PATH`
 PROG_DIR=$SELF_DIR/../target/release/
 
+if [ $# != 7 ]
+then
+    echo "Usage:" $0 " <slc port> <data port> <board ip> <cfg> <dump file> <session name> <loop>"
+    exit
+fi
 
-SPORT=$1
+
+
+SLC_PORT=$1
+DATA_PORT=$2
 BPORT=1234  # Fixed port number
-BIP=$2
-CFG=$3
-DUMP_FILE=$4
-SESSION_NAME=$5
-loop=$6
+BIP=$3
+CFG=$4
+DUMP_FILE=$5
+SESSION_NAME=$6
+loop=$7
 
 session_exists=0
 
@@ -43,7 +45,7 @@ fi
 
 tmux select-pane -t 0
 echo "Now starting server."
-tmux send-keys "$PROG_DIR/trend_server 0.0.0.0:${SPORT} 8888 $DUMP_FILE" C-m
+tmux send-keys "$PROG_DIR/trend_server 0.0.0.0 ${SLC_PORT} ${DATA_PORT} 8888 $DUMP_FILE" C-m
 #sleep .5  # Needed on laptop
 echo "Now sending message to board."
 sleep 0.1
