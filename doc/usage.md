@@ -1,18 +1,16 @@
 # Start the Data Acquisition
 
 ## Run the DAQ from scratch 
-In this section, we describe how to run each single command for DAQ
+In this section, we describe how to run each single DAQ command
 
 ### Start a server
 
 #### The concept of ```server```
-A ```server``` is a process (or in other words, a program) listening to a certain SLC port and a certain payload data port, receiving corresponding  messages and storing the messages to disk.
+In GRANDProto35, a ```server``` is a process (or in other words, a program) listening to a certain SLC port and a certain payload data port. It receives messages from the remote DAQ Front End Units (FEUs) connected to these ports and stores these messages to disk.
 
-A server process also response to any Ack message from DAQ boards. 
-It will forward Ack to a local monitor port (127.0.0.1:<Monitor Port>), so that the sending message process will be informed about whether remote board has received the command.
-The idea is that the sending command process (usually ```send_msg```) will start its own mini-server (do not confused with the previously mentioned server process) thread, which listens to the monitor port. 
-As soon as the server process receives any Ack message from one DAQ board, it will be forwarded to the mini-server thread through the monitor port. 
-Then the sending message process can get known that the remote board has received and responsed the command that it has just sent.
+It is the "ear" of the DAQ central program in its communication with the remote FEUs. Its counterpart -the mouth- is the ```send_msg``` program, which sends commands to the FEUs.
+When the FEU succesfully receives a command, it sends back an acknowledgement message (notted ACK in the following). The ```server``` forwards it to a local monitor port (127.0.0.1:<Monitor Port>), which informs the ```send_msg``` program that the remote FEU has received the command.
+(The trick here is that ```send_msg``` will start its own mini-server (not to be confused with the previously mentioned ```server```) thread, which listens to the monitor port. As soon as the server process receives any ACK message from one FEU, it will forward it to the mini-server thread through the monitor port and the ```send_msg````gets the information.)
 
 
 #### The command to start the server
