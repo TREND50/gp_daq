@@ -1,3 +1,5 @@
+# This readme will be reconstructed soon, for now, read documents in [doc](doc)
+
 # Grandproto Data Acquisition program
 
 ## Why uspgrading from the original program?
