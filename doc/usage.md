@@ -5,7 +5,7 @@ In this section, we describe how to a GRAND DAQ Master within few minutes :-)
 
 
 ### Communication between central DAQ and Front-End Units
-GRANDProto35 DAQ has a multi-layer structure. At the core of it is a very basic and rigid system of formated words (see details here: [TREND DAQ] (http://www.iap.fr/grand/wikigrand/index.php?title=File:TRENDDAQv23.pdf) exchanged between the Front-End Units (ie the electronic boards installed at the foot of the antennas, called FEUs in the following) and the central DAQ program (cDAQ). UDP is used for communication, a fast but not secured protocol (i.e. no built-in mechanism to ensure that a sent package is received).
+GRANDProto35 DAQ has a multi-layer structure. At the core of it is a very basic and rigid system of formated words (see details here: [TREND DAQ](http://www.iap.fr/grand/wikigrand/index.php?title=File:TRENDDAQv23.pdf) exchanged between the Front-End Units (ie the electronic boards installed at the foot of the antennas, called FEUs in the following) and the central DAQ program (cDAQ). UDP is used for communication, a fast but not secured protocol (i.e. no built-in mechanism to ensure that a sent package is received).
 
 Two main processes are in charge of communication on the cDAQ side:
 - ```send_msg``` is its "mouth". It sends commands to operate remote FEUs in the form of the above-mentionned words. 
@@ -21,7 +21,7 @@ Standard commands have been written in files in YAML format. We recommand to use
 ```
 cargo run --bin send_msg --release some.yaml ${BOARD_IP}:${BOARD_PORT} ${MON_PORT}
 ```
-where ```$BOARD_IP``` is the IP adress of the targetted FEU, ```$BOARD_PORT``` the port used to send messages (usually 1234) and```$MON_PORT``` the Monitor Port (arbitrary value set through [setting_addr](gp_daq/doc/setting_addr.md), 8888 is suggested).
+where ```$BOARD_IP``` is the IP adress of the targetted FEU, ```$BOARD_PORT``` the port used to send messages (usually 1234) and```$MON_PORT``` the Monitor Port (arbitrary value set through [setting_addr](setting_addr.md), 8888 is suggested).
 
 
 ### Running ```trend_server```
