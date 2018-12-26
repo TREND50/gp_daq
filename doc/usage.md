@@ -48,12 +48,12 @@ Later this feature will be removed to save some disk space and bandwidth.
 Scripts were written to operate DAQ boards. They are merely batched commands.
 
 ### ```run.sh```
-The most foundational script is ```scripts/run.sh```
+The script at the core of all others is ```scripts/run.sh```
 It can be called with following arguments
 ```
 scripts/run.sh $SLC_PORT $DATA_PORT $BOARD_IP some.yaml $SESSION_NAME $LOOP
 ``` 
-This script will start a ```tmux``` session, in which a ```trend_server``` is runed.
+This script will start a ```tmux``` session, in which a ```trend_server``` is run.
 After the background ```trend_server``` is started, this script will call the ```send_msg``` command to send commands defined in the file some.yaml.
 ```$LOOP``` argument defines how many times the command should be sent. Other arguments should be self-explained.
 
