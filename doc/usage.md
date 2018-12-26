@@ -13,9 +13,7 @@ Two main processes are in charge of communication on the cDAQ side:
         gp_daq/doc/setting_addr.md
        for details) where it receives messages from the remote FEUs, and stores these messages to disk (see below for details).
 
-Note here that there is no direct communication between ```send_msg``` and ```trend_server```. However, when a FEU succesfully receives a command, it sends back an acknowledgement message (noted ACK in the following) which is read by the ```trend_server```. ```trend_server``` then forwards the ACK message to a local monitor port (127.0.0.1:< Monitor Port >). ```send_msg``` will for its part start its own mini-server (not to be confused with the previously mentioned ```trend_server```), which listens to this very same monitor port. This workaround allows to garantee that the initial command was succesfully received.
-  
-(The trick here is that ```send_msg``` will start its own mini-server (not to be confused with ```trend_server```) thread, which listens to the monitor port. As soon as the server process receives any ACK message from one FEU, it will forward it to the mini-server thread through the monitor port and the ```send_msg``` gets the information.)
+Note here that there is no direct communication between ```send_msg``` and ```trend_server```. However, when a FEU succesfully receives a command, it sends back an acknowledgement message (noted ACK in the following) which is read by the ```trend_server```. ```trend_server``` then forwards the ACK message to a local monitor port (127.0.0.1:< Monitor Port >). ```send_msg``` will for its part start its own mini-server (not to be confused with the previously mentioned ```trend_server```), which listens to this very same monitor port. This work-around allows the ```send_msg``` program to check the success of its command, and more generaly the cDAQ to be aware of the status of the remote FEUs.
 
 ### Sending commands
 
