@@ -1,24 +1,24 @@
 # Initiallizing ip addresses
 
-## Relavent programms:
+## Relevant programms:
 1. set_addr
 2. trend_server
 
 
 ## Steps
-1. cd to ```scripts/```
-2. Ensure there is a file containing two columns with 1st column to be the mac address and the 2nd column to be the subnet IP address, defaultly there should be one. In following steps, we assume the name of the file to be $MAC_FILE
-3. Confirm the name of the network interface card usually something like ```eth0```, ```enp3s0f1```. In following steps, we assume the name of the interface card to be $IFACE
-4. Run following command:
+1. Go to directory ```scripts/```
+2. Ensure there is a txt file containing two columns with 1st column to be the mac address and the 2nd column to be the subnet IP address. At present this file is called ```mac_file.txt```. In the following, we will assume that the name of the file is $MAC_FILE.
+3. Confirm the name of the network interface card usually using```ifconfig```. It should be the card associated with the IP adress 192.168.1.10. At present it is ```enp3s0f1```, but in other cases it could be ```eth0```. In the following, we will assume that the name of the interface card is $IFACE
+4. Run the following commands:
 ```
 $> cd scripts/
 $> ./gen_ip_cfg.sh $IFACE $MAC_FILE >addr.yaml
 $> cd ../
 #Optionally run a server to receive the ACK
 $> cargo run --bin trend_server --release 0.0.0.0 1235 1236 8888 some_name_not_important
-$> sudo cargo run --bin enp3s0f1 --release scripts/addr.yaml 1234 8888
+$> sudo cargo run --bin $IFACE --release scripts/addr.yaml 1234 8888
 ```
 
 where ```8888``` is the monitoring port, its value is arbitrary.
 
-After running above commands, if any board has been initialized to its desired IP address, then ACK msg will be responsed by the server program and forwarded to the set_addr program, so that you can check whether the board has any response.
+After running the above commands, the board should be succesfully initialized. If this is the case, then an ACK msg will be sent back in response to any command sent by the central DAQ and forwarded to the set_addr program.
