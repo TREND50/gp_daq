@@ -9,7 +9,9 @@ GRANDProto35 DAQ has a multi-layer structure. At the core of it is a very basic 
 
 Two main processes are in charge of communication on the cDAQ side:
 - ```send_msg``` is its "mouth". It sends commands to operate remote FEUs in the form of the above-mentionned words. 
-- the ```trend_server``` process is its "ears". It listens to a pre-defined SLC port and a certain payload data port (see for details). It receives messages from the remote FEUs connected to these ports, and stores these messages to disk (see below for details).
+- the ```trend_server``` process is its "ears". It listens to a pre-defined SLC port and a certain payload data port (see 
+        gp_daq/doc/setting_addr.md
+       for details). It receives messages from the remote FEUs connected to these ports, and stores these messages to disk (see below for details).
 
 Note here that there is no direct communication between ```send_msg``` and ```trend_server```. However, when a FEU succesfully receives a command, it sends back an acknowledgement message (noted ACK in the following) which is thus read by the ```trend_server```. ```trend_server``` then forwards the ACK message to a local monitor port (127.0.0.1:<Monitor Port>). ```send_msg``` will for its part start its own mini-server (not to be confused with the previously mentioned ```server```) thread, which listens to this very same monitor port. This workaround allows to garantee that the initial command was succesfully received.
   
@@ -21,7 +23,9 @@ Standard commands have been written in files in YAML format. We recommand to use
 ```
 cargo run --bin send_msg --release some.yaml ${BOARD_IP}:${BOARD_PORT} ${MON_PORT}
 ```
-where ```$BOARD_IP``` is the IP adress of the targetted FEU, ```$BOARD_PORT``` the port that used to send messages (usually 1234) and```$MON_PORT``` the Monitor Port (arbitrary value set in , 8888 is suggested).
+where ```$BOARD_IP``` is the IP adress of the targetted FEU, ```$BOARD_PORT``` the port that used to send messages (usually 1234) and```$MON_PORT``` the Monitor Port (arbitrary value set in 
+        gp_daq/doc/setting_addr.md
+      , 8888 is suggested).
 
 
 ### Running ```trend_server```
