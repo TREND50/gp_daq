@@ -17,7 +17,7 @@ Note here that there is no direct communication between ```send_msg``` and ```tr
 
 ### Sending commands
 
-Standard commands have been written in files in YAML format. We recommand to use them only. The ```send_msg``` will read these files, interpret them and build teh corresponding formated words to be sent to the FEUs through this command:
+Standard commands have been written in files in YAML format. We recommand to use them only. The ```send_msg``` will read these files, interpret them and build the corresponding formated words to be sent to the FEUs through this command:
 ```
 cargo run --bin send_msg --release some.yaml ${BOARD_IP}:${BOARD_PORT} ${MON_PORT}
 ```
