@@ -1,5 +1,9 @@
 # GRANDproto Data Acquisition Program
 
+## I'm impatient!
+Read: [TL;DR](too_long_no_read.md)
+
+
 ## How to install the program?
 ### [Installation](installation.md)
 
