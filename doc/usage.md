@@ -54,9 +54,11 @@ It can be called with following arguments
 scripts/run.sh $SLC_PORT $DATA_PORT $BOARD_IP some.yaml $SESSION_NAME $LOOP
 ``` 
 This script will start a ```tmux``` session, in which a ```trend_server``` is run.
-After the background ```trend_server``` is started, this script will call the ```send_msg``` command to send commands defined in the file some.yaml.
-```$LOOP``` argument defines how many times the command should be sent. Other arguments should be self-explained.
+After the background ```trend_server``` is started, this script will call the ```send_msg``` command to send commands defined in the file ```some.yaml```. The ```$LOOP``` argument defines how many times the command should be sent. Other arguments should be self-explainatory.
 
-### Other scripts
-Currently only two scripts have been verified: ```phys.sh``` and ```minBias.sh```. ```phys.sh``` allows to start a "standard" acquisition with triggers from the X & Y channels of each antenna. ```minBias.sh``` collects soft-triggered samples of data ---minimal-biased, hence the name of script--- which can be used to monitor the quality of the data taking. The variation of the baseline level of the signal with time in particular allows to measure the ~ daily fluctuation expected from teh transit of the galactic plane in the antenna field of view.
+### ```phys.sh```
+The script ```phys.sh``` allows to start a "standard" acquisition with triggers from the X & Y channels of each antenna. 
+
+### ```minBias.sh```
+The script ```minBias.sh``` collects soft-triggered samples of data ---minimal-biased, hence the name of script--- which can be used to monitor the quality of the data taking. The variation of the baseline level of the signal with time in particular allows to measure the ~ daily fluctuation expected from teh transit of the galactic plane in the antenna field of view.
 
