@@ -1,7 +1,7 @@
 # Start the Data Acquisition
 
 ## Run the DAQ from scratch 
-In this section, we describe how to a GRAND DAQ Master within few minutes :-)
+In this section, we describe how to become a GRANDProto35 DAQ Master within few minutes :-)
 
 
 ### Communication between central DAQ and Front-End Units
