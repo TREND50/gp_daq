@@ -21,4 +21,4 @@ $> sudo cargo run --bin $IFACE --release scripts/addr.yaml 1234 8888
 
 where ```8888``` is the monitoring port, its value is arbitrary.
 
-After running the above commands, the board should be succesfully initialized. If this is the case, then an ACK msg will be sent back in response to any command sent by the central DAQ and forwarded to the set_addr program.
+After running the above commands, the board should be succesfully initialized. If this is the case, then an ACK msg will be sent back in response to any command from the central DAQ and forwarded to the set_addr program.
