@@ -10,7 +10,7 @@ GRANDProto35 DAQ has a multi-layer structure. At the core of it is a very basic 
 Two main processes are in charge of communication on the cDAQ side:
 - ```send_msg``` is its "mouth". It sends commands to operate remote FEUs in the form of the above-mentionned words. 
 - the ```trend_server``` process is its "ears". It listens to pre-defined SLC and data ports (see 
-        [setting address](gp_daq/doc/setting_addr.md)
+        [this page](gp_daq/doc/setting_addr.md)
        for details) where it receives messages from the remote FEUs, and stores these messages to disk (see below for details).
 
 Note here that there is no direct communication between ```send_msg``` and ```trend_server```. However, when a FEU succesfully receives a command, it sends back an acknowledgement message (noted ACK in the following) which is read by the ```trend_server```. ```trend_server``` then forwards the ACK message to a local monitor port (127.0.0.1:< Monitor Port >). ```send_msg``` will for its part start its own mini-server (not to be confused with the previously mentioned ```trend_server```), which listens to this very same monitor port. This work-around allows the ```send_msg``` program to check the success of its command, and more generaly the cDAQ to be aware of the status of the remote FEUs.
@@ -21,9 +21,7 @@ Standard commands have been written in files in YAML format. We recommand to use
 ```
 cargo run --bin send_msg --release some.yaml ${BOARD_IP}:${BOARD_PORT} ${MON_PORT}
 ```
-where ```$BOARD_IP``` is the IP adress of the targetted FEU, ```$BOARD_PORT``` the port used to send messages (usually 1234) and```$MON_PORT``` the Monitor Port (arbitrary value set in 
-        gp_daq/doc/setting_addr.md
-      , 8888 is suggested).
+where ```$BOARD_IP``` is the IP adress of the targetted FEU, ```$BOARD_PORT``` the port used to send messages (usually 1234) and```$MON_PORT``` the Monitor Port (arbitrary value set through [setting_addr](gp_daq/doc/setting_addr.md), 8888 is suggested).
 
 
 ### Running ```trend_server```
