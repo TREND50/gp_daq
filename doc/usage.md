@@ -21,7 +21,7 @@ Standard commands have been written in files in YAML format. We recommand to use
 ```
 cargo run --bin send_msg --release some.yaml ${BOARD_IP}:${BOARD_PORT} ${MON_PORT}
 ```
-where ```$BOARD_IP``` is the IP adress of the targetted FEU, ```$BOARD_PORT``` the port used to send messages (usually 1234) and```$MON_PORT``` the Monitor Port (arbitrary value set through [setting_addr](setting_addr.md), 8888 is suggested).
+where ```$BOARD_IP``` is the IP adress of the targetted FEU, ```$BOARD_PORT``` the port used to send messages (usually 1234) and```$MON_PORT``` the Monitor Port (arbitrary value, 8888 is suggested). All ports values are set through the [setting_addr](setting_addr.md) command.
 
 
 ### Running ```trend_server```
