@@ -33,8 +33,8 @@ The ```trend_server``` process is run the following way:
 ```
 cargo run --bin trend_server --release 0.0.0.0 $SLC_PORT $DATA_PORT $MON_PORT $OUT_PREFIX
 ```
-where ```$SLC_PORT``` is the port for receiving the SLC msg (usually 1235)
-```$DATA_PORT``` is the port for receiving the DATA msg, (usualy 1236)
+where ```$SLC_PORT``` is the port receiving the SLC message (usually 1235)
+```$DATA_PORT``` is the port receiving the DATA message, (usually 1236)
 ```$MON_PORT``` is the port that used to forward the Ack message (arbitrary value set in , 8888 is suggested).
 ```OUT_PREFIX``` is the prefix of output files. 
 
