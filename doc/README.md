@@ -1,7 +1,7 @@
 # GRANDproto Data Acquisition Program
 
 ## I'm impatient!
-1. Read: [TL;DR](too_long_no_read.md) for how to start DAQ from scratch.
+1. Read: [TLNR](too_long_no_read.md) for how to start DAQ from scratch.
 2. Read: [YAML note](yaml_note.md) for reading the data file from python.
 
 
