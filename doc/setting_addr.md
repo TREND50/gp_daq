@@ -7,7 +7,7 @@
 
 ## Steps
 1. Go to directory ```scripts/```
-2. Ensure there is a txt file containing two columns with 1st column to be the mac address and the 2nd column to be the subnet IP address. At present this file is called ```mac_file.txt```. In the following, we will assume that the name of the file is $MAC_FILE.
+2. Ensure there is a txt file containing two columns with 1st column being the mac address and the 2nd column the 3-digit subnet IP address. At present this file is called ```mac_file.txt```. In the following, we will assume that the name of the file is $MAC_FILE.
 3. Confirm the name of the network interface card usually using```ifconfig```. It should be the card associated with the IP adress 192.168.1.10. At present it is ```enp3s0f1```, but in other cases it could be ```eth0```. In the following, we will assume that the name of the interface card is $IFACE
 4. Run the following commands:
 ```
