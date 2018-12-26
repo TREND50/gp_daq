@@ -19,6 +19,6 @@ $> cargo run --bin trend_server --release 0.0.0.0 1235 1236 8888 some_name_not_i
 $> sudo cargo run --bin enp3s0f1 --release scripts/addr.yaml 1234 8888
 ```
 
-where ```8888```` is the monitoring port, its value is arbitrary.
+where ```8888``` is the monitoring port, its value is arbitrary.
 
 After running above commands, if any board has been initialized to its desired IP address, then ACK msg will be responsed by the server program and forwarded to the set_addr program, so that you can check whether the board has any response.
