@@ -11,7 +11,7 @@ Two main processes are in charge of communication on the cDAQ side:
 - ```send_msg``` is its "mouth". It sends commands to operate remote FEUs in the form of the above-mentionned words. 
 - the ```trend_server``` process is its "ears". It listens to pre-defined SLC and data ports (see 
         gp_daq/doc/setting_addr.md
-       for details). It receives messages from the remote FEUs connected to these ports, and stores these messages to disk (see below for details).
+       for details) where it receives messages from the remote FEUs, and stores these messages to disk (see below for details).
 
 Note here that there is no direct communication between ```send_msg``` and ```trend_server```. However, when a FEU succesfully receives a command, it sends back an acknowledgement message (noted ACK in the following) which is thus read by the ```trend_server```. ```trend_server``` then forwards the ACK message to a local monitor port (127.0.0.1:<Monitor Port>). ```send_msg``` will for its part start its own mini-server (not to be confused with the previously mentioned ```server```) thread, which listens to this very same monitor port. This workaround allows to garantee that the initial command was succesfully received.
   
