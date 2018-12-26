@@ -1,6 +1,6 @@
-# Initiallizing ip addresses
+# Initiallizing IP addresses
 
-## Relevant programms:
+## Relevant programs:
 1. set_addr
 2. trend_server
 
