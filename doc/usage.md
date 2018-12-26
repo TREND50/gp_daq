@@ -36,9 +36,8 @@ cargo run --bin trend_server --release 0.0.0.0 $SLC_PORT $DATA_PORT $MON_PORT $O
 where ```$SLC_PORT``` is the port receiving the SLC message (usually 1235)
 ```$DATA_PORT``` is the port receiving the DATA message, (usually 1236)
 ```$MON_PORT``` is the port that used to forward the Ack message (arbitrary value set in , 8888 is suggested).
-```OUT_PREFIX``` is the prefix of output files. 
+```OUT_PREFIX``` is the prefix of output files: TRENDDATA messages will be saved to ```${OUT_PREFIX}.bin``` and all other received messages saved to ```${OUT_PREFIX}.txt```, except for ACK messages, only forwarded to the Monitor Port (see above).
 
-TRENDDATA messages will be saved to ```${OUT_PREFIX}.bin```, ACK messages will only be forwarded to the Monitor Port (see above) and all other received messages saved to ```${OUT_PREFIX}.txt```.
 The command line argument ```0.0.0.0``` instructs the ```trend_server``` to bind ports to all local IP addresses.
 In current stage, TRENDDATA will also be saved to (human readable) ```${OUT_PREFIX}.yaml``` files for debugging.
 Later this feature will be removed to save some disk space and bandwidth.
