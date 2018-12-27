@@ -6,6 +6,7 @@ extern crate serde_yaml;
 use std::env;
 use std::fs::{File, OpenOptions};
 use std::io::Write;
+use std::env::args;
 use std::net::SocketAddr;
 use std::sync::mpsc::sync_channel;
 use std::thread;
@@ -23,20 +24,20 @@ use gp_daq::utils::add_source_info;
 //use gp_daq::io::txt;
 
 fn main() {
-    let args: Vec<_> = std::env::args().collect();
-    if args.len() < 6 {
+    //let args: Vec<_> = std::env::args().collect();
+    if std::env::args().len()<5 {
         eprintln!(
-            "Usage: {} <addr> <slc port> <data port> <monitor port> <out file prefix>",
-            args[0]
+            "Usage: {} <addr> <slc port> <data port> <monitor port> [out file prefix]",
+            args().nth(0).unwrap()
         );
         return;
     }
 
-    let monitor_port: u16 = args[4].parse().expect("invalid monitor port");
-    let addr_slc: SocketAddr = format!("{}:{}", args[1], args[2])
+    let monitor_port: u16 = args().nth(4).unwrap().parse().expect("invalid monitor port");
+    let addr_slc: SocketAddr = format!("{}:{}", args().nth(1).unwrap(), args().nth(2).unwrap())
         .parse()
         .expect("invalid slc port");
-    let addr_data: SocketAddr = format!("{}:{}", args[1], args[3])
+    let addr_data: SocketAddr = format!("{}:{}", args().nth(1).unwrap(), args().nth(3).unwrap())
         .parse()
         .expect("invalid slc port");
 
@@ -65,26 +66,22 @@ fn main() {
         }
     }));
 
-    let file_prefix = args[5].clone();
-    let mut yaml_file = OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open(file_prefix + ".yaml")
-        .expect("cannot open file");
-    /*
-        let file_prefix = args[3].clone();
-        let mut txt_file = OpenOptions::new()
+    let mut yaml_file=args().nth(5).map(|file_prefix|{
+        OpenOptions::new()
             .create(true)
             .append(true)
-            .open(file_prefix + ".txt")
-            .expect("cannot open file");
-        */
+            .open(file_prefix + ".yaml")
+            .expect("cannot open file")
+    });
 
+    let mut bin_file=args().nth(5).map(|file_prefix|{
+        File::create(file_prefix + ".bin").unwrap()
+    });
 
-    let file_prefix = args[5].clone();
-    let mut bin_file = File::create(file_prefix + ".bin").unwrap();
-    let fh = FileHeader::new();
-    fh.write_to(&mut bin_file);
+    bin_file.iter_mut().for_each(|f|{
+        let fh = FileHeader::new();
+        fh.write_to( f);
+    });
 
     let (tx_slc, rx)=sync_channel(16);
 
@@ -130,7 +127,9 @@ fn main() {
                 ref payload,
             } => {
                 let ev = Event::from_trend_data(&content, &payload);
-                ev.write_to(&mut bin_file);
+                bin_file.iter_mut().for_each(|f|{
+                    ev.write_to(f);
+                });
                 let mut v = msg.to_yaml();
                 add_source_info(&mut v, &now, &ip[..]);
                 tx_data.send(v).expect("send err3");
@@ -144,18 +143,14 @@ fn main() {
         }
         //msg.write_to_txt(&mut txt_file, &now).unwrap();
     }));
-    let th_io=thread::spawn(move ||{
-        loop {
-            let v = rx.recv().expect("recv err");
-            serde_yaml::to_writer(&mut yaml_file, &v).expect("write failed");
-            writeln!(yaml_file).unwrap();
-        }
-    });
-    let th_slc=thread::spawn(move||server_slc.run());
-    let th_data=thread::spawn(move||server_data.run());
+    thread::spawn(move||server_slc.run());
+    thread::spawn(move||server_data.run());
 
-    th_io.join().expect("join err");
-    th_slc.join().expect("join err");
-    th_data.join().expect("join err");
-
+    loop {
+        let v = rx.recv().expect("recv err");
+        yaml_file.iter_mut().for_each(|f|{
+            serde_yaml::to_writer(&mut *f, &v).expect("write failed");
+            writeln!(f).unwrap();
+        });
+    }
 }
