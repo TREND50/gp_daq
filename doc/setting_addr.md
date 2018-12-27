@@ -15,8 +15,8 @@ $> cd scripts/
 $> ./gen_ip_cfg.sh $IFACE $MAC_FILE >addr.yaml
 $> cd ../
 #Optionally run a server to receive the ACK
-$> cargo run --bin trend_server --release 0.0.0.0 1235 1236 8888 some_name_not_important
-$> sudo cargo run --bin enp3s0f1 --release scripts/addr.yaml 1234 8888
+$> cargo run --bin trend_server --release 0.0.0.0 1235 1236 8888
+$> sudo target/release/set_addr enp3s0f1 --release scripts/addr.yaml 1234 8888
 ```
 
 where ```8888``` is the monitoring port, its value is arbitrary.
