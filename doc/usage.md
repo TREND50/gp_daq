@@ -1,56 +1,62 @@
 # Start the Data Acquisition
 
 ## Run the DAQ from scratch 
-In this section, we describe how to run each single command for DAQ
-
-### Start a server
-
-#### The concept of ```server```
-A ```server``` is a process (or in other words, a program) listening to a certain SLC port and a certain payload data port, receiving corresponding  messages and storing the messages to disk.
-
-A server process also response to any Ack message from DAQ boards. 
-It will forward Ack to a local monitor port (127.0.0.1:<Monitor Port>), so that the sending message process will be informed about whether remote board has received the command.
-The idea is that the sending command process (usually ```send_msg```) will start its own mini-server (do not confused with the previously mentioned server process) thread, which listens to the monitor port. 
-As soon as the server process receives any Ack message from one DAQ board, it will be forwarded to the mini-server thread through the monitor port. 
-Then the sending message process can get known that the remote board has received and responsed the command that it has just sent.
+In this section, we describe how to become a GRANDProto35 DAQ Master within few minutes :-)
 
 
-#### The command to start the server
-```
-cargo run --bin trend_server --release 0.0.0.0 $SLC_PORT $DATA_PORT $MON_PORT $OUT_PREFIX
-```
-where ```$SLC_PORT``` is the port for receiving the SLC msg, which is usually 1235
-```$DATA_PORT``` is the port for receiving the DATA msg, which is usually 1236
-```$MON_PORT``` is the port that used to forward the Ack message, which is arbitrary, and the suggested value is 8888.
-```OUT_PREFIX``` is the prefix of output files. TRENDDATA message will be save to ```${OUT_PREFIX}.bin``` and all other messages, but Ack msg will be saved to ```${OUT_PREFIX}.bin```, and Ack msg will only be forwarded.
-The command line argument ```0.0.0.0``` instructs the server to bind ports to all local ip addresses.
-In current stage, TRENDDATA will also be save to ```${OUT_PREFIX}.yaml``` file for debugging.
-Later this feature will be removed.
+### Communication between central DAQ and Front-End Units
+GRANDProto35 DAQ has a multi-layer structure. At the core of it is a very basic and rigid system of formated words (see details in [GP35 FrontEnd FirmWare manual](http://www.iap.fr/grand/wikigrand/index.php?title=File:TRENDDAQv23.pdf) exchanged between the Front-End Units (ie the electronic boards installed at the foot of the antennas, called FEUs in the following) and the central DAQ program (cDAQ). UDP is used for communication, a fast but not secured protocol (i.e. no built-in mechanism to ensure that a sent package is received).
 
-### Send a command to remote board in order to do some operation
-The command to operate remote DAQ boards is sent through the program ```send_msg```.
-The commands are defined in YAML files. 
-Each YAML file can contain more than one message, and they are sent one by one.
-Running following command will cause messages be sent to one desired board.
+Two main processes are in charge of communication on the cDAQ side:
+- ```send_msg``` is its "mouth". It sends commands to operate remote FEUs in the form of the above-mentionned words. 
+- the ```trend_server``` process is its "ears". It listens to pre-defined SLC and data ports (see 
+        [this page](setting_addr.md)
+       for details) where it receives messages from the remote FEUs, and stores these messages to disk (see below for details).
+
+Note here that there is no direct communication between ```send_msg``` and ```trend_server```. However, when a FEU succesfully receives a command, it sends back an acknowledgement message (noted ACK in the following) which is read by the ```trend_server```. ```trend_server``` then forwards the ACK message to a local monitor port (127.0.0.1:< Monitor Port >). ```send_msg``` will for its part start its own mini-server (not to be confused with the previously mentioned ```trend_server```), which listens to this very same monitor port. This work-around allows the ```send_msg``` program to check the success of its command, and more generaly the cDAQ to be aware of the status of the remote FEUs.
+
+### Sending commands
+
+Standard commands have been written in files in YAML format. We recommand to use them only. The ```send_msg``` will read these files, interpret them and build the corresponding formated words to be sent to the FEUs through this command:
 ```
 cargo run --bin send_msg --release some.yaml ${BOARD_IP}:${BOARD_PORT} ${MON_PORT}
 ```
-The arguments are self-explained.
+where ```$BOARD_IP``` is the IP adress of the targetted FEU, ```$BOARD_PORT``` the port used to send messages (usually 1234) and```$MON_PORT``` the Monitor Port (arbitrary value, 8888 is suggested). All ports values are set through the [setting_addr](setting_addr.md) command.
+
+
+### Running ```trend_server```
+
+The ```trend_server``` process is run the following way:
+
+```
+cargo run --bin trend_server --release 0.0.0.0 $SLC_PORT $DATA_PORT $MON_PORT $OUT_PREFIX
+```
+where ```$SLC_PORT``` is the port receiving the SLC message (usually 1235)
+```$DATA_PORT``` is the port receiving the DATA message, (usually 1236)
+```$MON_PORT``` is the port that used to forward the Ack message (arbitrary value set in , 8888 is suggested).
+```OUT_PREFIX``` is the prefix of output files: TRENDDATA messages will be saved to ```${OUT_PREFIX}.bin``` and all other received messages saved to ```${OUT_PREFIX}.txt```, except for ACK messages, only forwarded to the Monitor Port (see above).
+
+The command line argument ```0.0.0.0``` instructs the ```trend_server``` to bind ports to all local IP addresses.
+In current stage, TRENDDATA will also be saved to (human readable) ```${OUT_PREFIX}.yaml``` files for debugging.
+Later this feature will be removed to save some disk space and bandwidth.
+
 
 
 ## Operate DAQ boards with scripts
-The scripts for operating DAQ boards are merely batched commands.
+Scripts were written to operate DAQ boards. They are merely batched commands.
 
 ### ```run.sh```
-The most foundational script is the ```scripts/run.sh```
+The script at the core of all others is ```scripts/run.sh```
 It can be called with following arguments
 ```
 scripts/run.sh $SLC_PORT $DATA_PORT $BOARD_IP some.yaml $SESSION_NAME $LOOP
 ``` 
-This script will start a ```tmux``` session, in which a ```trend_server``` is runed.
-After the background ```trend_server``` is started, this script will call the ```send_msg``` command to send commands defined in the file some.yaml.
-```$LOOP``` argument defines how many times the command should be sent. Other arguments should be self-explained.
+This script will start a ```tmux``` session, in which a ```trend_server``` is run.
+After the background ```trend_server``` is started, this script will call the ```send_msg``` command to send commands defined in the file ```some.yaml```. The ```$LOOP``` argument defines how many times the command should be sent. Other arguments should be self-explainatory.
 
-### Other scripts
-Currently only two scripts have been verified they are ```phys.sh``` and ```minBias.sh```
-Both scripts call run.sh to do the actual jobs.
+### ```phys.sh```
+The script ```phys.sh``` allows to start a "standard" acquisition with triggers from the X & Y channels of each antenna. 
+
+### ```minBias.sh```
+The script ```minBias.sh``` collects soft-triggered samples of data ---minimal-biased, hence the name of script--- which can be used to monitor the quality of the data taking. The variation of the baseline level of the signal with time in particular allows to measure the ~ daily fluctuation expected from the transit of the galactic plane in the antenna field of view.
+

@@ -1,7 +1,7 @@
 # All following commands should be executed in ```gp_daq``` directory.
 
 # Setting the ip addresses before DAQ
-Assume the name of the network interface card that connects to the DAQ boards is ```enp3s0f1```(check it with the command ```ifconfig```
+Assuming the name of the network interface card corresponding to IP 192.168.1.10 is ```enp3s0f1```(check it with the command ```ifconfig```), then do:
 
 ```
 $> cd scripts/
@@ -20,3 +20,4 @@ cargo run --bin trend_server --release 0.0.0.0 1235 1236 8888 /mnt/data/asdf
 ```
 cargo run --bin send_msg --release some.yaml 192.168.1.105:1234 8888
 ```
+This will send the message encoded in file ```some.yaml``` to the Front-End unit with ID 05.
