@@ -33,7 +33,9 @@ fn main() {
             println!("ack");
         }
         m => {
+            println!("-----");
             println!("{:?}", m);
+            m.display_as_words();
             if let std::net::IpAddr::V4(ip4) = b.ip() {
                 let ipu32: u32 = std::convert::From::from(ip4);
                 let mut ack = msgcont::Ack_([0_u32, 0_u32]);
