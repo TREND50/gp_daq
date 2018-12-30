@@ -8,7 +8,7 @@ $> cd scripts/
 $> ./gen_ip_cfg.sh enp3s0f1 mac_file.txt >addr.yaml  # generte the up-to-date yaml file to set the adresses
 $> cd ../
 $> cargo run --bin trend_server --release 0.0.0.0 1235 1236 8888 some_name_not_important  # start the trend_server
-$> sudo cargo run --bin set_addr enp3s0f1 --release scripts/addr.yaml 1234 8888  # set the adresses
+$> sudo target/release/set_addr enp3s0f1 scripts/addr.yaml 1234 8888  # set the adresses
 ```
 
 # Start a server
