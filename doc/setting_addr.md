@@ -17,7 +17,7 @@ $> cd ../
 #Optionally run a server to receive the ACK
 $> cargo run --bin trend_server --release 0.0.0.0 1235 1236 8888
 # then run the actual command to set the address
-$> sudo target/release/set_addr enp3s0f1 --release scripts/addr.yaml 1234 8888
+$> sudo target/release/set_addr enp3s0f1 scripts/addr.yaml 1234 8888
 ```
 
 where ```8888``` is the monitoring port, its value is arbitrary.
