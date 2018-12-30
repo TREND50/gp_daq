@@ -1,14 +1,14 @@
 # All following commands should be executed in ```gp_daq``` directory.
 
-# Setting the ip addresses before DAQ
+# Setting the IP addresses before running DAQ
 Assuming the name of the network interface card corresponding to IP 192.168.1.10 is ```enp3s0f1```(check it with the command ```ifconfig```), then do:
 
 ```
 $> cd scripts/
-$> ./gen_ip_cfg.sh enp3s0f1 mac_file.txt >addr.yaml
+$> ./gen_ip_cfg.sh enp3s0f1 mac_file.txt >addr.yaml  # generte the up-to-date yaml file to set the adresses
 $> cd ../
-$> cargo run --bin trend_server --release 0.0.0.0 1235 1236 8888 some_name_not_important
-$> sudo cargo run --bin enp3s0f1 --release scripts/addr.yaml 1234 8888
+$> cargo run --bin trend_server --release 0.0.0.0 1235 1236 8888 some_name_not_important  # start the trend_server
+$> sudo cargo run --bin set_addr enp3s0f1 --release scripts/addr.yaml 1234 8888  # set the adresses
 ```
 
 # Start a server

@@ -55,7 +55,7 @@ This script will start a ```tmux``` session, in which a ```trend_server``` is ru
 After the background ```trend_server``` is started, this script will call the ```send_msg``` command to send commands defined in the file ```some.yaml```. The ```$LOOP``` argument defines how many times the command should be sent. Other arguments should be self-explainatory.
 
 ### ```phys.sh```
-The script ```phys.sh``` allows to start a "standard" acquisition with triggers from the X & Y channels of each antenna. 
+The script ```phys.sh``` allows to start a "standard" acquisition with triggers from the X & Y channels of each antenna. Parameters are < boardID >, < Threshold X- >,< Th X+ >,< Th Y- >,< Th Y+ >,< Th Z- >,< Th Z+ >,<TrigPattern> where Threshold is the threshold value of the trigger signal in units of mV (corresponding to ~400 times the signal at antenna input) and TrigPattern is a series of 6 binary values corresponding to the 6 trigger chanels in the following order:  Z+,Y+,X+,Z-,Y-,X-. Usually we choose TrigPattern=011000, corresponding to trigger on channels X+ and Y+ only, and Threshold = 100 or 200 on all channels.
 
 ### ```minBias.sh```
 The script ```minBias.sh``` collects soft-triggered samples of data ---minimal-biased, hence the name of script--- which can be used to monitor the quality of the data taking. The variation of the baseline level of the signal with time in particular allows to measure the ~ daily fluctuation expected from the transit of the galactic plane in the antenna field of view.
