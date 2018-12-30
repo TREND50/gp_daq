@@ -23,9 +23,9 @@ fn main() {
 
     let mut server = TrendServer::new(args[1].parse().expect("invalid port"));
     let slc_port: u16 = args[2].parse().expect("Not a valid slc port");
-    server.register_handler(Box::new(|a, b| {
+    server.register_handler(Box::new(|_a, b| {
         println!("recv from {:?}", b);
-        println!("msg:\n{:?}", a);
+        //println!("msg:\n{:?}", a);
     }));
 
     server.register_handler(Box::new(move |a, b| match a {
