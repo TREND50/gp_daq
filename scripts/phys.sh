@@ -4,6 +4,7 @@ SELF_PATH=`realpath $0`
 SELF_DIR=`dirname $SELF_PATH`
 PROG_DIR=$SELF_DIR/../target/release/
 CFG_DIR=$SELF_DIR/../cfgs
+#export DATADIR=/mnt/disk/
 
 if [ "x$DATADIR" = x ]
 then
