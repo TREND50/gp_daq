@@ -20,4 +20,5 @@ cargo run --bin trend_server --release 0.0.0.0 1235 1236 8888 /mnt/data/asdf
 ```
 cargo run --bin send_msg --release some.yaml 192.168.1.105:1234 8888
 ```
-This will send the message encoded in file ```some.yaml``` to the Front-End unit with ID 05.
+This will send the message encoded in file ```some.yaml``` to the Front-End unit with ID 05. Several yaml configuration files have already been written and are stored in the folder ```cfg```.
+
