@@ -4,7 +4,7 @@ bytes = '0.4.11'
 chrono = '0.4.6'
 etherparse = '0.7.1'
 interfaces = '0.0.4'
-pcap = '0.7.0'
+pnet = '0.21.0'
 serde_yaml = '0.8.8'
 tokio = '0.1.13'
 

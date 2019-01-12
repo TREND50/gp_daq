@@ -4,11 +4,13 @@
 
 extern crate gp_daq;
 extern crate interfaces;
-extern crate pcap;
+extern crate pnet;
 extern crate serde_yaml;
 
+use pnet::datalink::interfaces;
+
 use gp_daq::net::net_err::NetErr;
-use pcap::Device;
+//use pcap::Device;
 use std::io::Read;
 use std::str;
 //use gp_daq::msgcont::Daq;
@@ -102,13 +104,14 @@ fn main() {
                 let _port2 = v["port2"].as_u64().unwrap() as u16;
                 let mut src_mac = [0; 6];
                 src_mac[..6].clone_from_slice(&mac_addr[..6]);
-                let dev = Device {
-                    name: args[1].to_string(),
-                    desc: None,
-                };
+                let dev_name=args[1].to_string();
                 println!("setting board {:x?}'s IP address to be {:?}", bmac, bip);
+
+                let dev=interfaces().into_iter().filter(|x|{x.name==dev_name}).nth(0).expect("Cannot find dev");
+                println!("{:?}", dev);
+
                 let _ = send_by_raw(
-                    dev,
+                    &dev,
                     bmac,
                     src_mac,
                     std::net::SocketAddrV4::new(

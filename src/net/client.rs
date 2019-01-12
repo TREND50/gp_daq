@@ -3,7 +3,11 @@ use super::super::msg_def::TrendMsg;
 use super::server::TrendServer;
 use crate::net::net_err::NetErr;
 use etherparse::PacketBuilder;
-use pcap::{Capture, Device};
+
+
+use pnet::datalink::{channel, Config, ChannelType, Channel};
+use pnet::datalink::NetworkInterface;
+
 use std;
 use std::net::{SocketAddr, ToSocketAddrs, UdpSocket};
 use std::time::Duration;
@@ -54,7 +58,7 @@ pub fn send_msg(
 }
 
 pub fn send_by_raw(
-    dev: Device,
+    dev:&NetworkInterface,
     dst_mac: [u8; 6],
     src_mac: [u8; 6],
     src_addr: impl ToSocketAddrs + Send + 'static,
@@ -83,7 +87,15 @@ pub fn send_by_raw(
         panic!();
     };
 
-    let mut cap = Capture::from_device(dev).unwrap().open().unwrap();
+    let cfg=Config{write_buffer_size:1024, read_buffer_size:65536, read_timeout:None, write_timeout:None, channel_type:ChannelType::Layer2, bpf_fd_attempts:1000,};
+
+
+    let (mut tx, _)=
+        if let Channel::Ethernet(tx, rx)=channel(&dev, cfg).expect("canot open channel"){
+            (tx, rx)
+        }else{
+            panic!();
+        };
     let builder = PacketBuilder::ethernet2(src_mac, dst_mac)
         .ipv4(src_ip, dst_ip, 255)
         .udp(src_port, dst_port);
@@ -97,7 +109,8 @@ pub fn send_by_raw(
 
         let j = std::thread::spawn(move || {
             std::thread::sleep(Duration::new(0, TIMEOUT));
-            cap.sendpacket(&data[..]).expect("send data failed");
+            //cap.sendpacket(&data[..]).expect("send data failed");
+            let _=tx.send_to(&data[..], None).unwrap();
         });
         let result = if let Some(msg) = server.wait_for(Some(Duration::new(1, 0))) {
             match msg {
@@ -113,7 +126,8 @@ pub fn send_by_raw(
         let _ = j.join();
         result
     } else {
-        cap.sendpacket(&data[..]).expect("send data failed");
+        //cap.sendpacket(&data[..]).expect("send data failed");
+        let _=tx.send_to(&data[..], None).unwrap();
         Ok(())
     }
 }
