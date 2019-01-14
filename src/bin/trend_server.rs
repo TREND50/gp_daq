@@ -138,7 +138,7 @@ fn main() {
                 });
                 let mut v = msg.to_yaml();
                 add_source_info(&mut v, &now, &ip[..]);
-                tx_data.send(v).expect("send err3");
+                //tx_data.send(v).expect("send err3");
             }
             ref msg => {
                 eprintln!("Warning: only data msgs are expected to be received through data port");
