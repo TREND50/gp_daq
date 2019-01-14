@@ -72,13 +72,13 @@ fn main() {
         }
     }));
 
-    let mut yaml_file = args().nth(5).map(|file_prefix| {
+    let yaml_file = args().nth(5).map(|file_prefix| {
         OpenOptions::new()
             .create(true)
             .append(true)
             .open(file_prefix + ".yaml")
             .expect("cannot open file")
-    }).expect("Error file cannot be opened");
+    });
 
     let mut bin_file = args()
         .nth(5)
@@ -152,9 +152,11 @@ fn main() {
     thread::spawn(move || server_slc.run());
     thread::spawn(move || server_data.run());
 
-    loop {
-        let v = rx.recv().expect("recv err");
-        serde_yaml::to_writer(&mut yaml_file, &v).expect("write failed");
-        writeln!(yaml_file).unwrap();
-    }
+    yaml_file.map(|mut f|{
+        loop {
+            let v = rx.recv().expect("recv err");
+            serde_yaml::to_writer(&mut f, &v).expect("write failed");
+            writeln!(f).unwrap();
+        }
+    });
 }
