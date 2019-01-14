@@ -87,7 +87,7 @@ fn main() {
         fh.write_to(f);
     });
 
-    let (tx_slc, rx) = sync_channel(16);
+    let (tx_slc, rx) = sync_channel(1024);
 
     let tx_data = tx_slc.clone();
 
