@@ -3,14 +3,14 @@
 extern crate chrono;
 extern crate gp_daq;
 extern crate serde_yaml;
+use chrono::offset::Utc;
 use std::env;
+use std::env::args;
 use std::fs::{File, OpenOptions};
 use std::io::Write;
-use std::env::args;
 use std::net::SocketAddr;
 use std::sync::mpsc::sync_channel;
 use std::thread;
-use chrono::offset::Utc;
 
 use gp_daq::io::event_file::{Event, FileHeader};
 use gp_daq::io::yaml::YamlIOable;
@@ -25,7 +25,7 @@ use gp_daq::utils::add_source_info;
 
 fn main() {
     //let args: Vec<_> = std::env::args().collect();
-    if std::env::args().len()<5 {
+    if std::env::args().len() < 5 {
         eprintln!(
             "Usage: {} <addr> <slc port> <data port> <monitor port> [out file prefix]",
             args().nth(0).unwrap()
@@ -33,7 +33,11 @@ fn main() {
         return;
     }
 
-    let monitor_port: u16 = args().nth(4).unwrap().parse().expect("invalid monitor port");
+    let monitor_port: u16 = args()
+        .nth(4)
+        .unwrap()
+        .parse()
+        .expect("invalid monitor port");
     let addr_slc: SocketAddr = format!("{}:{}", args().nth(1).unwrap(), args().nth(2).unwrap())
         .parse()
         .expect("invalid slc port");
@@ -66,7 +70,7 @@ fn main() {
         }
     }));
 
-    let mut yaml_file=args().nth(5).map(|file_prefix|{
+    let mut yaml_file = args().nth(5).map(|file_prefix| {
         OpenOptions::new()
             .create(true)
             .append(true)
@@ -74,19 +78,18 @@ fn main() {
             .expect("cannot open file")
     });
 
-    let mut bin_file=args().nth(5).map(|file_prefix|{
-        File::create(file_prefix + ".bin").unwrap()
-    });
+    let mut bin_file = args()
+        .nth(5)
+        .map(|file_prefix| File::create(file_prefix + ".bin").unwrap());
 
-    bin_file.iter_mut().for_each(|f|{
+    bin_file.iter_mut().for_each(|f| {
         let fh = FileHeader::new();
-        fh.write_to( f);
+        fh.write_to(f);
     });
 
-    let (tx_slc, rx)=sync_channel(16);
+    let (tx_slc, rx) = sync_channel(16);
 
-    let tx_data=tx_slc.clone();
-
+    let tx_data = tx_slc.clone();
 
     server_slc.register_handler(Box::new(move |msg, socket| {
         let now = Utc::now();
@@ -127,7 +130,7 @@ fn main() {
                 ref payload,
             } => {
                 let ev = Event::from_trend_data(&content, &payload);
-                bin_file.iter_mut().for_each(|f|{
+                bin_file.iter_mut().for_each(|f| {
                     ev.write_to(f);
                 });
                 let mut v = msg.to_yaml();
@@ -143,12 +146,12 @@ fn main() {
         }
         //msg.write_to_txt(&mut txt_file, &now).unwrap();
     }));
-    thread::spawn(move||server_slc.run());
-    thread::spawn(move||server_data.run());
+    thread::spawn(move || server_slc.run());
+    thread::spawn(move || server_data.run());
 
     loop {
         let v = rx.recv().expect("recv err");
-        yaml_file.iter_mut().for_each(|f|{
+        yaml_file.iter_mut().for_each(|f| {
             serde_yaml::to_writer(&mut *f, &v).expect("write failed");
             writeln!(f).unwrap();
         });

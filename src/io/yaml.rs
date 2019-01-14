@@ -116,6 +116,7 @@ pub fn load_vpower23(data: &Value, k: &str) -> Option<u16> {
 
 pub fn load_th(data: &Value, k: &str) -> Option<u16> {
     if data[k].is_u64() {
+        println!("Warning, th value is given in integer, so that no *2 operation");
         load_u16(data, k)
     } else if data[k].is_f64() {
         let th = data[k].as_f64().unwrap();

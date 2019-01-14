@@ -211,9 +211,9 @@ impl TrendMsg {
         Self::from_word_vec(temp_vec)
     }
 
-    pub fn display_as_words(&self){
-        let words=self.to_word_vec();
-        words.iter().for_each(|&x|{
+    pub fn display_as_words(&self) {
+        let words = self.to_word_vec();
+        words.iter().for_each(|&x| {
             println!("{:0>8x}", x);
         })
     }

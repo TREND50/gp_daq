@@ -11,11 +11,14 @@ use tokio::prelude::Stream;
 
 pub struct TrendServer {
     socket: UdpSocket,
-    handlers: Vec<Box<dyn FnMut(&TrendMsg, std::net::SocketAddr) -> ()+Send+Sync>>,
+    handlers: Vec<Box<dyn FnMut(&TrendMsg, std::net::SocketAddr) -> () + Send + Sync>>,
 }
 
 impl TrendServer {
-    pub fn register_handler(&mut self, h: Box<dyn FnMut(&TrendMsg, std::net::SocketAddr) -> ()+Send+Sync>) {
+    pub fn register_handler(
+        &mut self,
+        h: Box<dyn FnMut(&TrendMsg, std::net::SocketAddr) -> () + Send + Sync>,
+    ) {
         self.handlers.push(h);
     }
 
