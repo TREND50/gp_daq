@@ -132,6 +132,7 @@ fn main() {
                 ref payload,
             } => {
                 //print!("\\b#");
+                print!(".");
                 let ev = Event::from_trend_data(&content, &payload);
                 bin_file.iter_mut().for_each(|f| {
                     ev.write_to(f);
