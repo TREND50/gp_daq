@@ -3,13 +3,15 @@
 extern crate chrono;
 extern crate gp_daq;
 extern crate serde_yaml;
+extern crate crossbeam;
 use chrono::offset::Utc;
 use std::env;
 use std::env::args;
 use std::fs::{File, OpenOptions};
 use std::io::Write;
 use std::net::SocketAddr;
-use std::sync::mpsc::sync_channel;
+//use std::sync::mpsc::channel as channel;
+use crossbeam::channel::unbounded as channel;
 use std::thread;
 
 use gp_daq::io::event_file::{Event, FileHeader};
@@ -76,7 +78,7 @@ fn main() {
             .append(true)
             .open(file_prefix + ".yaml")
             .expect("cannot open file")
-    });
+    }).expect("Error file cannot be opened");
 
     let mut bin_file = args()
         .nth(5)
@@ -87,7 +89,7 @@ fn main() {
         fh.write_to(f);
     });
 
-    let (tx_slc, rx) = sync_channel(1024);
+    let (tx_slc, rx) = channel();
 
     let tx_data = tx_slc.clone();
 
@@ -152,9 +154,7 @@ fn main() {
 
     loop {
         let v = rx.recv().expect("recv err");
-        yaml_file.iter_mut().for_each(|f| {
-            serde_yaml::to_writer(&mut *f, &v).expect("write failed");
-            writeln!(f).unwrap();
-        });
+        serde_yaml::to_writer(&mut yaml_file, &v).expect("write failed");
+        writeln!(yaml_file).unwrap();
     }
 }

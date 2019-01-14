@@ -2,11 +2,12 @@
 bitfield = '0.13.1'
 bytes = '0.4.11'
 chrono = '0.4.6'
-etherparse = '0.7.1'
+crossbeam = '0.6.0'
+etherparse = '0.8.0'
 interfaces = '0.0.4'
 pnet = '0.21.0'
 serde_yaml = '0.8.8'
-tokio = '0.1.13'
+tokio = '0.1.14'
 
 [package]
 authors = ['Gu Junhua <jhgu@nao.cas.cn>']
