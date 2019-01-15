@@ -2,7 +2,7 @@
 
 SELF_PATH=`realpath $0`
 SELF_DIR=`dirname $SELF_PATH`
-PROG_DIR=$SELF_DIR/../target/release/
+PROG_DIR=$SELF_DIR/../
 
 if [ $# != 7 ]
 then
@@ -45,7 +45,7 @@ fi
 
 tmux select-pane -t 0
 echo "Now starting server."
-tmux send-keys "$PROG_DIR/trend_server 0.0.0.0 ${SLC_PORT} ${DATA_PORT} 8888 $DUMP_FILE" C-m
+tmux send-keys "cargo run -q --manifest-path $PROG_DIR/Cargo.toml --bin trend_server --release -- -a 0.0.0.0 -s ${SLC_PORT} -d ${DATA_PORT} -m 8888 -t ${DUMP_FILE}.txt -b ${DUMP_FILE}.bin -v 1"  C-m
 #sleep .5  # Needed on laptop
 echo "Now sending message to board."
 sleep 0.1
@@ -55,10 +55,10 @@ if [ $loop -gt 1 ]
 then
   for i in $(seq 1 $loop); do 
     echo "Now sending request" $i ", then sleep 0.1s."
-    $PROG_DIR/send_msg $CFG ${BIP}:${BPORT} 8888
+    cargo run -q --manifest-path $PROG_DIR/Cargo.toml --bin send_msg -- $CFG ${BIP}:${BPORT} 8888
     sleep 0.1
   done
 else
     echo "Now sending message to board."
-    $PROG_DIR/send_msg $CFG ${BIP}:${BPORT} 8888
+    cargo run -q --manifest-path $PROG_DIR/Cargo.toml --bin send_msg -- $CFG ${BIP}:${BPORT} 8888
 fi
