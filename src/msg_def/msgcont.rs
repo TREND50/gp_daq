@@ -15,7 +15,7 @@ pub trait Decode
 where
     Self: Sized,
 {
-    fn decode(&[u32]) -> Option<Self>;
+    fn decode(_: &[u32]) -> Option<Self>;
 }
 
 bitfield! {
