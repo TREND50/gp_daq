@@ -4,6 +4,7 @@ extern crate chrono;
 extern crate gp_daq;
 extern crate serde_yaml;
 extern crate crossbeam;
+use std::sync::{Arc, Mutex};
 use chrono::offset::Utc;
 use std::env;
 use std::env::args;
@@ -73,11 +74,16 @@ fn main() {
     }));
 
     let yaml_file = args().nth(5).map(|file_prefix| {
+        Arc::new(Mutex::new(
         OpenOptions::new()
             .create(true)
             .append(true)
             .open(file_prefix + ".yaml")
-            .expect("cannot open file")
+            .expect("cannot open file")))
+    });
+
+    let yaml_file_data:Option<_>=yaml_file.as_ref().map(|f|{
+        f.clone()
     });
 
     let mut bin_file = args()
@@ -88,10 +94,6 @@ fn main() {
         let fh = FileHeader::new();
         fh.write_to(f);
     });
-
-    let (tx_slc, rx) = channel();
-
-    let tx_data = tx_slc.clone();
 
     server_slc.register_handler(Box::new(move |msg, socket| {
         let now = Utc::now();
@@ -112,7 +114,12 @@ fn main() {
             ref msg => {
                 let mut v = msg.to_yaml();
                 add_source_info(&mut v, &now, &ip[..]);
-                tx_slc.send(v).expect("send err2");
+                yaml_file.as_ref().map(|f|{
+                    f.lock().map(|mut f|{
+                        serde_yaml::to_writer(&mut *f, &v).expect("write failed");
+                        writeln!(f).unwrap();
+                    }).unwrap();
+                });
             }
         }
         //msg.write_to_txt(&mut txt_file, &now).unwrap();
@@ -145,19 +152,22 @@ fn main() {
                 eprintln!("Warning: only data msgs are expected to be received through data port");
                 let mut v = msg.to_yaml();
                 add_source_info(&mut v, &now, &ip[..]);
-                tx_data.send(v).expect("send err4");
+                //tx_data.send(v).expect("send err4");
+                yaml_file_data.as_ref().map(|f|{
+                    f.lock().map(|mut f|{
+                        serde_yaml::to_writer(&mut *f, &v).expect("write failed");
+                        writeln!(f).unwrap();
+                    }).unwrap();
+                });
+
+
             }
         }
         //msg.write_to_txt(&mut txt_file, &now).unwrap();
     }));
-    thread::spawn(move || server_slc.run());
-    thread::spawn(move || server_data.run());
+    let th_slc=thread::spawn(move || server_slc.run());
+    let th_data=thread::spawn(move || server_data.run());
 
-    yaml_file.map(|mut f|{
-        loop {
-            let v = rx.recv().expect("recv err");
-            serde_yaml::to_writer(&mut f, &v).expect("write failed");
-            writeln!(f).unwrap();
-        }
-    });
+    th_slc.join().unwrap();
+    th_data.join().unwrap();
 }
