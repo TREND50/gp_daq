@@ -38,7 +38,7 @@ en_osc: 0
 cntrl_adc: 0b10
 offst: 90
 enable_pd: 0b111
-dis_lna: 0b111
+dis_lna: 0b000
 le: 1
 att1: 100
 att2: 100
