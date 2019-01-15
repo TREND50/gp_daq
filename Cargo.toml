@@ -2,7 +2,7 @@
 bitfield = '0.13.1'
 bytes = '0.4.11'
 chrono = '0.4.6'
-clap = "2.32.0"
+clap = '2.32.0'
 etherparse = '0.8.0'
 interfaces = '0.0.4'
 pnet = '0.21.0'

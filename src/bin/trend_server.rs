@@ -1,19 +1,19 @@
 #![allow(unused_imports)]
 
 extern crate chrono;
+extern crate clap;
 extern crate gp_daq;
 extern crate serde_yaml;
-extern crate clap;
 
 use clap::{App, Arg, SubCommand};
 
-use std::sync::{Arc, Mutex};
 use chrono::offset::Utc;
 use std::env;
 use std::env::args;
 use std::fs::{File, OpenOptions};
 use std::io::Write;
 use std::net::SocketAddr;
+use std::sync::{Arc, Mutex};
 //use std::sync::mpsc::channel as channel;
 
 use std::thread;
@@ -99,16 +99,28 @@ fn main() {
         )
         .get_matches();
 
-    let verbose=matches.value_of("verbose level").map_or(0,|v|{v.parse::<u32>().expect("Invalid verbose value")});
+    let verbose = matches
+        .value_of("verbose level")
+        .map_or(0, |v| v.parse::<u32>().expect("Invalid verbose value"));
 
-    let monitor_port:u16=matches.value_of("Monitor port").unwrap().parse().expect("Invalid monitor port");
-    let addr_slc:SocketAddr=format!("{}:{}",
-                                    matches.value_of("Server IP").unwrap(), matches.value_of("SLC port").unwrap()).parse().expect("Invalid slc port");
+    let monitor_port: u16 = matches
+        .value_of("Monitor port")
+        .unwrap()
+        .parse()
+        .expect("Invalid monitor port");
+    let addr_slc: SocketAddr = format!(
+        "{}:{}",
+        matches.value_of("Server IP").unwrap(),
+        matches.value_of("SLC port").unwrap()
+    ).parse()
+    .expect("Invalid slc port");
 
-    let addr_data:SocketAddr=format!("{}:{}",
-                                    matches.value_of("Server IP").unwrap(), matches.value_of("Data port").unwrap()).parse().expect("Invalid data port");
-
-
+    let addr_data: SocketAddr = format!(
+        "{}:{}",
+        matches.value_of("Server IP").unwrap(),
+        matches.value_of("Data port").unwrap()
+    ).parse()
+    .expect("Invalid data port");
 
     let mut server_slc = TrendServer::new(addr_slc);
     server_slc.register_handler(Box::new(move |a, b| {
@@ -137,22 +149,23 @@ fn main() {
 
     let yaml_file = matches.value_of("Text file").map(|fname| {
         Arc::new(Mutex::new(
-        OpenOptions::new()
-            .create(true)
-            .append(true)
-            .open(fname)
-            .expect("cannot open text file")))
+            OpenOptions::new()
+                .create(true)
+                .append(true)
+                .open(fname)
+                .expect("cannot open text file"),
+        ))
     });
 
-
-    let yaml_file_data:Option<_>=if  matches.is_present("No Data in txt"){
+    let yaml_file_data: Option<_> = if matches.is_present("No Data in txt") {
         None
-    }else{
+    } else {
         yaml_file.as_ref().cloned()
     };
 
-    let mut bin_file =matches.value_of("Bin file").map(|fname|
-        File::create(fname ).expect("cannot open bin file"));
+    let mut bin_file = matches
+        .value_of("Bin file")
+        .map(|fname| File::create(fname).expect("cannot open bin file"));
 
     bin_file.iter_mut().for_each(|f| {
         let fh = FileHeader::new();
@@ -205,7 +218,7 @@ fn main() {
                 ref content,
                 ref payload,
             } => {
-                if verbose>0{
+                if verbose > 0 {
                     eprint!(".");
                 }
                 let ev = Event::from_trend_data(&content, &payload);
@@ -216,8 +229,8 @@ fn main() {
                 add_source_info(&mut v, &now, &ip[..]);
                 //tx_data.send(v).expect("send err3");
 
-                yaml_file_data.as_ref().and_then(|f|{
-                    let _=f.lock().map(|mut f|{
+                yaml_file_data.as_ref().and_then(|f| {
+                    let _ = f.lock().map(|mut f| {
                         serde_yaml::to_writer(&mut *f, &v).expect("write failed");
                         writeln!(f).unwrap();
                         Some(())
@@ -230,8 +243,8 @@ fn main() {
                 let mut v = msg.to_yaml();
                 add_source_info(&mut v, &now, &ip[..]);
                 //tx_data.send(v).expect("send err4");
-                yaml_file_data.as_ref().and_then(|f|{
-                    let _=f.lock().map(|mut f|{
+                yaml_file_data.as_ref().and_then(|f| {
+                    let _ = f.lock().map(|mut f| {
                         serde_yaml::to_writer(&mut *f, &v).expect("write failed");
                         writeln!(f).unwrap();
                         Some(())
@@ -242,8 +255,8 @@ fn main() {
         }
         //msg.write_to_txt(&mut txt_file, &now).unwrap();
     }));
-    let th_slc=thread::spawn(move || server_slc.run());
-    let th_data=thread::spawn(move || server_data.run());
+    let th_slc = thread::spawn(move || server_slc.run());
+    let th_data = thread::spawn(move || server_data.run());
 
     th_slc.join().unwrap();
     th_data.join().unwrap();
