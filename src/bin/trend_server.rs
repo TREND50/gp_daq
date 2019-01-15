@@ -180,7 +180,7 @@ fn main() {
                 add_source_info(&mut v, &now, &ip[..]);
 
                 yaml_file.as_ref().and_then(|f|{
-                    f.lock().and_then(|mut f|{
+                    let _=f.lock().and_then(|mut f|{
                         serde_yaml::to_writer(&mut *f, &v).expect("write failed");
                         writeln!(f).unwrap();
                         Ok(())
@@ -217,7 +217,7 @@ fn main() {
                 //tx_data.send(v).expect("send err3");
 
                 yaml_file_data.as_ref().and_then(|f|{
-                    f.lock().map(|mut f|{
+                    let _=f.lock().map(|mut f|{
                         serde_yaml::to_writer(&mut *f, &v).expect("write failed");
                         writeln!(f).unwrap();
                         Some(())
@@ -231,7 +231,7 @@ fn main() {
                 add_source_info(&mut v, &now, &ip[..]);
                 //tx_data.send(v).expect("send err4");
                 yaml_file_data.as_ref().and_then(|f|{
-                    f.lock().map(|mut f|{
+                    let _=f.lock().map(|mut f|{
                         serde_yaml::to_writer(&mut *f, &v).expect("write failed");
                         writeln!(f).unwrap();
                         Some(())
