@@ -18,7 +18,6 @@ use std::sync::{Arc, Mutex};
 use serde_yaml::{from_reader, from_str, Value};
 
 use gp_daq::io::event_file::{Event, FileHeader};
-use gp_daq::io::yaml::str2u64;
 use gp_daq::io::yaml::YamlIOable;
 use gp_daq::msg_def::msgcont::Ack_;
 use gp_daq::msg_def::TrendMsg;
@@ -26,6 +25,22 @@ use gp_daq::net::client::send_msg;
 use gp_daq::net::server::TrendServer;
 use gp_daq::utils::add_source_info;
 use std::thread;
+
+fn str2pattern(s: &str) -> Option<u64> {
+    let r = if s.len() <= 2 {
+        u64::from_str_radix(s, 10)
+    } else if &s[0..2] == "0b" || &s[0..2] == "0B" {
+        u64::from_str_radix(&s[2..], 2)
+    } else if &s[0..2] == "0x" || &s[0..2] == "0X" {
+        u64::from_str_radix(&s[2..], 16)
+    } else {
+        u64::from_str_radix(s, 10)
+    };
+    match r {
+        Ok(x) => Some(x),
+        _ => None,
+    }
+}
 
 fn main() {
     let matches = App::new("Filter events in a yaml data file according to given trigger pattern")
@@ -74,7 +89,7 @@ fn main() {
             .expect("cannot open text file")
     });
 
-    let pattern = str2u64(matches.value_of("pattern").unwrap()).expect("Invalid pattern str");
+    let pattern = str2pattern(matches.value_of("pattern").unwrap()).expect("Invalid pattern str");
     println!("filtering yaml according to pattern 0b{:b}", pattern);
 
     let mut bytes = Vec::new();
