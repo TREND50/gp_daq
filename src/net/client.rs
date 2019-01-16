@@ -11,7 +11,7 @@ use std;
 use std::net::{SocketAddr, ToSocketAddrs, UdpSocket};
 use std::time::Duration;
 
-const TIMEOUT: u32 = 500_000_000;
+const TIMEOUT: u32 = 10_000_000; //10ms=10e6 ns
 
 pub fn send_msg(
     addr: impl ToSocketAddrs + Send + 'static,

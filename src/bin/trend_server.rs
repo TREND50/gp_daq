@@ -218,13 +218,13 @@ fn main() {
                     eprint!(".");
                 }
                 let ev = Event::from_trend_data(&content, &payload);
-                if let Some(f)=bin_file.as_mut(){
+                if let Some(f) = bin_file.as_mut() {
                     ev.write_to(f);
                 }
                 let mut v = msg.to_yaml();
                 add_source_info(&mut v, &now, &ip[..]);
                 //tx_data.send(v).expect("send err3");
-                if let Some(f)=yaml_file_data.as_mut(){
+                if let Some(f) = yaml_file_data.as_mut() {
                     serde_yaml::to_writer(&mut *f, &v).expect("write failed");
                     writeln!(f).unwrap();
                 }
@@ -234,7 +234,7 @@ fn main() {
                 let mut v = msg.to_yaml();
                 add_source_info(&mut v, &now, &ip[..]);
                 //tx_data.send(v).expect("send err4");
-                if let Some(f)=yaml_file_data.as_mut(){
+                if let Some(f) = yaml_file_data.as_mut() {
                     serde_yaml::to_writer(&mut *f, &v).expect("write failed");
                     writeln!(f).unwrap();
                 }
