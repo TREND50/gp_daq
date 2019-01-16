@@ -36,6 +36,6 @@ echo 'Present run ID' $NRUN
 
 
 # Execute run
-$SELF_DIR/run.sh  1235 192.168.1.1$BOARDID $CFG_DIR/slcreq.yaml $DATADIR/S$NRUN'_b'$BOARDID.data "wslc" $2  # Ask for a loop
+$SELF_DIR/run.sh  1235 1236 192.168.1.1${BOARDID} $CFG_DIR/slcreq.yaml $DATADIR/S$NRUN'_b'$BOARDID.data "wslc" $2  # Ask for a loop
 echo "Now killing server wslc."
 tmux kill-window -t "wslc"

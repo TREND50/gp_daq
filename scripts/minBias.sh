@@ -17,10 +17,16 @@ ${SELF_DIR}/run_server.sh 1235 1236 $DATADIR/M$NRUN.data "minbias"
 
 cat boardsIn.txt | while read BOARDID
 do
-  ${PROG_DIR}/send_msg ${CFG_DIR}/minbias.yaml 192.168.1.1${BOARDID}:1234 8888
-  sleep 1
+  echo "Now doing board " $BOARDID
+  for i in {1..500}
+  do 
+    echo "Doing event " $i
+    ${PROG_DIR}/send_msg ${CFG_DIR}/minbias.yaml 192.168.1.1${BOARDID}:1234 8888
+  done
+  #sleep 1
   #$SELF_DIR/run.sh  1235 1236 192.168.1.1${BOARDID} ${CFG_DIR}/slcreq.yaml $DATADIR/S$NRUN'_b'$BOARDID.data "wslc" 0
-  ${PROG_DIR}/send_msg ${CFG_DIR}/slcreq.yaml 192.168.1.1${BOARDID}:1234 8888
+  # Get slc data as well
+  #${PROG_DIR}/send_msg ${CFG_DIR}/slcreq.yaml 192.168.1.1${BOARDID}:1234 8888
 done
 
 #BOARDID=09
