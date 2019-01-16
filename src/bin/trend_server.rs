@@ -35,14 +35,14 @@ fn main() {
         .version("0.9")
         .author("GU Junhua. jhgu@nao.cas.cn")
         .about("Receiving TrendMsgs from remote DAQ Boards")
-        .arg(Arg::with_name("Server IP")
+        .arg(Arg::with_name("arg_server_ip")
                  .short("a")
                  .long("ipaddr")
                  .value_name("IP address")
                  .required(true)
                  .takes_value(true)
                  .help("The address of the ports to be bined to, can be either 0.0.0.0 or the IP address of the interface card"))
-        .arg(Arg::with_name("SLC port")
+        .arg(Arg::with_name("arg_slc_port")
             .short("s")
             .long("slcport")
             .value_name("SLC port")
@@ -50,7 +50,7 @@ fn main() {
             .takes_value(true)
             .help("The port to accept SLC messages")
         )
-        .arg(Arg::with_name("Monitor port")
+        .arg(Arg::with_name("arg_monitor_port")
             .short("m")
             .long("monport")
             .value_name("Monitor port")
@@ -58,7 +58,7 @@ fn main() {
             .takes_value(true)
             .help("The monitor of some send_msg command to receive Ack message")
         )
-        .arg(Arg::with_name("Data port")
+        .arg(Arg::with_name("arg_data_port")
             .short("d")
             .long("dataport")
             .value_name("DATA port")
@@ -66,7 +66,7 @@ fn main() {
             .takes_value(true)
             .help("The port to accept TrendData")
         )
-        .arg(Arg::with_name("Text file")
+        .arg(Arg::with_name("arg_text_file")
             .short("t")
             .long("txt")
             .value_name("File name")
@@ -74,7 +74,7 @@ fn main() {
             .takes_value(true)
             .help("Save received message to the text file ")
         )
-        .arg(Arg::with_name("Bin file")
+        .arg(Arg::with_name("arg_bin_file")
             .short("b")
             .long("bin")
             .value_name("File name")
@@ -82,14 +82,15 @@ fn main() {
             .required(false)
             .help("The file used to save only TrendData msg")
         )
-        .arg(Arg::with_name("No Data in txt")
-            .short("n")
-            .long("nodatatxt")
+        .arg(Arg::with_name("arg_text_file_for_bin")
+            .short("c")
+            .long("datatext")
             .required(false)
-            .takes_value(false)
-            .help("If this flag is given, then TrendMsg will not be saved to txt file")
+            .takes_value(true)
+            .value_name("File name")
+            .help("save data to a yaml file")
         )
-        .arg(Arg::with_name("verbose level")
+        .arg(Arg::with_name("arg_verbose_level")
             .short("v")
             .long("verbose")
             .required(false)
@@ -100,25 +101,25 @@ fn main() {
         .get_matches();
 
     let verbose = matches
-        .value_of("verbose level")
+        .value_of("arg_verbose_level")
         .map_or(0, |v| v.parse::<u32>().expect("Invalid verbose value"));
 
     let monitor_port: u16 = matches
-        .value_of("Monitor port")
+        .value_of("arg_monitor_port")
         .unwrap()
         .parse()
         .expect("Invalid monitor port");
     let addr_slc: SocketAddr = format!(
         "{}:{}",
-        matches.value_of("Server IP").unwrap(),
-        matches.value_of("SLC port").unwrap()
+        matches.value_of("arg_server_ip").unwrap(),
+        matches.value_of("arg_slc_port").unwrap()
     ).parse()
     .expect("Invalid slc port");
 
     let addr_data: SocketAddr = format!(
         "{}:{}",
-        matches.value_of("Server IP").unwrap(),
-        matches.value_of("Data port").unwrap()
+        matches.value_of("arg_server_ip").unwrap(),
+        matches.value_of("arg_data_port").unwrap()
     ).parse()
     .expect("Invalid data port");
 
@@ -147,24 +148,24 @@ fn main() {
         }
     }));
 
-    let yaml_file = matches.value_of("Text file").map(|fname| {
-        Arc::new(Mutex::new(
-            OpenOptions::new()
-                .create(true)
-                .append(true)
-                .open(fname)
-                .expect("cannot open text file"),
-        ))
+    let mut yaml_file = matches.value_of("arg_text_file").map(|fname| {
+        OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(fname)
+            .expect("cannot open text file")
     });
 
-    let yaml_file_data: Option<_> = if matches.is_present("No Data in txt") {
-        None
-    } else {
-        yaml_file.as_ref().cloned()
-    };
+    let mut yaml_file_data = matches.value_of("arg_text_file_for_bin").map(|fname| {
+        OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(fname)
+            .expect("cannot open text file for data")
+    });
 
     let mut bin_file = matches
-        .value_of("Bin file")
+        .value_of("arg_bin_file")
         .map(|fname| File::create(fname).expect("cannot open bin file"));
 
     bin_file.iter_mut().for_each(|f| {
@@ -191,15 +192,10 @@ fn main() {
             ref msg => {
                 let mut v = msg.to_yaml();
                 add_source_info(&mut v, &now, &ip[..]);
-
-                yaml_file.as_ref().and_then(|f|{
-                    let _=f.lock().and_then(|mut f|{
-                        serde_yaml::to_writer(&mut *f, &v).expect("write failed");
-                        writeln!(f).unwrap();
-                        Ok(())
-                    });
-                    Some(())
-                });
+                if let Some(f)=yaml_file.as_mut(){
+                    serde_yaml::to_writer(&mut *f, &v).expect("write failed");
+                    writeln!(f).unwrap();
+                }
             }
         }
         //msg.write_to_txt(&mut txt_file, &now).unwrap();
@@ -222,35 +218,26 @@ fn main() {
                     eprint!(".");
                 }
                 let ev = Event::from_trend_data(&content, &payload);
-                bin_file.iter_mut().for_each(|f| {
+                if let Some(f)=bin_file.as_mut(){
                     ev.write_to(f);
-                });
+                }
                 let mut v = msg.to_yaml();
                 add_source_info(&mut v, &now, &ip[..]);
                 //tx_data.send(v).expect("send err3");
-
-                yaml_file_data.as_ref().and_then(|f| {
-                    let _ = f.lock().map(|mut f| {
-                        serde_yaml::to_writer(&mut *f, &v).expect("write failed");
-                        writeln!(f).unwrap();
-                        Some(())
-                    });
-                    Some(())
-                });
+                if let Some(f)=yaml_file_data.as_mut(){
+                    serde_yaml::to_writer(&mut *f, &v).expect("write failed");
+                    writeln!(f).unwrap();
+                }
             }
             ref msg => {
                 eprintln!("Warning: only data msgs are expected to be received through data port");
                 let mut v = msg.to_yaml();
                 add_source_info(&mut v, &now, &ip[..]);
                 //tx_data.send(v).expect("send err4");
-                yaml_file_data.as_ref().and_then(|f| {
-                    let _ = f.lock().map(|mut f| {
-                        serde_yaml::to_writer(&mut *f, &v).expect("write failed");
-                        writeln!(f).unwrap();
-                        Some(())
-                    });
-                    Some(())
-                });
+                if let Some(f)=yaml_file_data.as_mut(){
+                    serde_yaml::to_writer(&mut *f, &v).expect("write failed");
+                    writeln!(f).unwrap();
+                }
             }
         }
         //msg.write_to_txt(&mut txt_file, &now).unwrap();
