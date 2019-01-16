@@ -2,7 +2,7 @@
 
 SELF_PATH=`realpath $0`
 SELF_DIR=`dirname $SELF_PATH`
-PROG_DIR=$SELF_DIR/../target/release/
+PROG_DIR=$SELF_DIR/../
 
 if [ $# != 4 ]
 then
