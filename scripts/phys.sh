@@ -42,10 +42,15 @@ echo "NRUN=" $NRUN
 python $SELF_DIR/fill_phys_yaml.py ${CFG_DIR}/physgen.yaml $2 $3 $4 $5 $6 $7 $8 $DATADIR/phys${NRUN}.yaml
 
 
+SLC_FILE=$DATADIR/S${NRUN}.yaml
+DATA_FILE=$DATADIR/R${NRUN}.data
+
+
 # Clean
 tmux kill-window -t "w"
+
 # Execute run
-$SELF_DIR/run.sh  1235 1236 192.168.1.1${BOARDID} $DATADIR/phys${NRUN}.yaml $DATADIR/R$NRUN.data "w" 0
+$SELF_DIR/run.sh  ${BOARDID} $DATADIR/phys${NRUN}.yaml 1235 $SLC_FILE 1236 $DATA_FILE "w" 0
 
 if [ $# == 8 ]
 then

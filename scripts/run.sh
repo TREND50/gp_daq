@@ -4,22 +4,22 @@ SELF_PATH=`realpath $0`
 SELF_DIR=`dirname $SELF_PATH`
 PROG_DIR=$SELF_DIR/../
 
-if [ $# != 7 ]
+if [ $# != 8 ]
 then
-    echo "Usage:" $0 " <slc port> <data port> <board ip> <cfg> <dump file> <session name> <loop>"
+    echo "Usage:" $0 "<board ID> <cfg file>  <slc port> <slc file> <data port> <data file> <session name> <loop>"
     exit
 fi
 
-
-
-SLC_PORT=$1
-DATA_PORT=$2
+BOARDID=$1
+BIP=192.168.1.1${BOARDID}
+CFG=$2
+SLC_PORT=$3
+SLC_FILE=$4
+DATA_PORT=$5
+DATA_FILE=$6
 BPORT=1234  # Fixed port number
-BIP=$3
-CFG=$4
-DUMP_FILE=$5
-SESSION_NAME=$6
-loop=$7
+SESSION_NAME=$7
+loop=$8
 
 session_exists=0
 
@@ -46,7 +46,7 @@ fi
 tmux select-pane -t 0
 echo "Now starting server."
 tmux send-keys "cargo run -q --manifest-path $PROG_DIR/Cargo.toml --bin \
-    trend_server --release -- -a 0.0.0.0 -s ${SLC_PORT} -d ${DATA_PORT} -m 8888 -t ${DUMP_FILE}.yaml -b ${DUMP_FILE}.bin -c ${DUMP_FILE}_data.yaml -v 1"  C-m
+    trend_server --release -- -a 0.0.0.0 -s ${SLC_PORT} -d ${DATA_PORT} -m 8888 -t ${SLC_FILE} -b ${DATA_FILE}.bin -c ${DATA_FILE}.yaml -v 1"  C-m
 #sleep .5  # Needed on laptop
 echo "Now sending message to board."
 sleep 0.1

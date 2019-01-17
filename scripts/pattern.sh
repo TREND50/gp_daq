@@ -39,6 +39,9 @@ echo 'Present run ID' $NRUN
 NRUN=$(($NRUN+1))
 echo 'New run ID' $NRUN
 
+SLC_FILE=$DATADIR/S${NRUN}_b${BOARDID}.yaml
+DATA_FILE=$DATADIR/P${NRUN}_b${BOARDID}.data
+
 
 if [ $2 = "0"  ]
 then
@@ -64,7 +67,7 @@ echo 'Calling ' $patterncfg
 # Clean
 tmux kill-window -t "w"
 # Execute run
-$SELF_DIR/run.sh 1236 192.168.1.1$BOARDID $patterncfg $DATADIR/P$NRUN'_b'$BOARDID.data "w" 0
+$SELF_DIR/run.sh $BOARDID $patterncfg 1235 $SLC_FILE 1236 $DATA_FILE "w" 0
 #sleep 2
 
 # Log run id
