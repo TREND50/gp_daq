@@ -98,6 +98,13 @@ fn main() {
             .value_name("Verbose level")
             .help("Currently only one verbose level is available, so simply fill 1|0 and 0 stands for not verbose")
         )
+        .arg(Arg::with_name("save_ack")
+        .short("A")
+        .long("ack")
+        .required(false)
+        .takes_value(false)
+                .help("whether save ack to txt file")
+        )
         .get_matches();
 
     let verbose = matches
@@ -173,6 +180,8 @@ fn main() {
         fh.write_to(f);
     });
 
+    let save_ack=matches.is_present("save_ack");
+
     server_slc.register_handler(Box::new(move |msg, socket| {
         let now = Utc::now();
 
@@ -188,7 +197,16 @@ fn main() {
                 //add_source_info(&mut v, &now, &ip[..]);
                 //tx_slc.send(v).expect("send err1");
             }
-            TrendMsg::Ack { .. } => (),
+            TrendMsg::Ack { .. } => {
+                if save_ack{
+                    let mut v = msg.to_yaml();
+                    add_source_info(&mut v, &now, &ip[..]);
+                    if let Some(f)=yaml_file.as_mut(){
+                        serde_yaml::to_writer(&mut *f, &v).expect("write failed");
+                        writeln!(f).unwrap();
+                    }
+                }
+            },
             ref msg => {
                 let mut v = msg.to_yaml();
                 add_source_info(&mut v, &now, &ip[..]);
