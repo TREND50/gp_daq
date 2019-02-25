@@ -235,7 +235,7 @@ fn main() {
 
     server_data.register_handler(Box::new(move |msg, socket| {
         let now = Utc::now();
-        let ts_sys=now.timestamp() as f64+now.timestamp_subsec_nanos() as f64*1e-9;
+        let ts_sys=now.timestamp() as f64+f64::from(now.timestamp_subsec_nanos())*1e-9;
 
         let ip: Vec<i64> = if let std::net::SocketAddr::V4(x) = socket {
             x.ip().octets().iter().map(|&x| i64::from(x)).collect()
@@ -257,11 +257,11 @@ fn main() {
                     eprint!(".");
                 }
 
-                let ts_board=content.sss() as f64+(f64::from(
+                let ts_board=f64::from(content.sss())+(f64::from(
                     4 * content.ts2() + u32::from(content.ts1pps()) - u32::from(content.ts1trigger()),
-                ) * 2.1);
+                ) * 2e-9);
 
-                let d=tscal.update(ip_u8.clone(), ts_sys, ts_board);
+                let d=tscal.update(ip_u8, ts_sys, ts_board);
 
 
                 let mut content1=content.clone();

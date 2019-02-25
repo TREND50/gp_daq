@@ -179,10 +179,10 @@ impl EventHeader {
             eventnr: cont.event_count() as u32,
             t3eventnr: 0,
             first_ls: 0,
-            event_sec: (cont.sss() as i32+sss_corr) as u32,
+            event_sec: (i32::from(cont.sss())+sss_corr) as u32,
             event_nsec: (f64::from(
                 4 * cont.ts2() + u32::from(cont.ts1pps()) - u32::from(cont.ts1trigger()),
-            ) * 2.1) as u32,
+            ) * 2.0) as u32,
             event_type: 0,
             event_vers: 0,
             ad1: 0,
@@ -248,7 +248,7 @@ impl LocalStationHeader {
             event_nr: cont.event_count() as u16,
             ls_id: (cont.ip() & 0xffff) as u16,
             header_length: 0,
-            gps_seconds: (cont.sss() as i32+sss_corr) as u32,
+            gps_seconds: (i32::from(cont.sss())+sss_corr) as u32,
             gps_nanoseconds: (f64::from(
                 4 * cont.ts2() + u32::from(cont.ts1pps()) - u32::from(cont.ts1trigger()),
             ) * 2.1) as u32,
