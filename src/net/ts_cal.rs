@@ -23,7 +23,7 @@ where IdT:std::cmp::Eq+Hash+Copy
     pub fn update(&mut self, ip:IdT, sys_ts:f64, board_ts:f64)->i64{
         let diff=sys_ts-board_ts;
 
-        let _shift=match self.shifts.entry(ip){
+        let shift=match self.shifts.entry(ip){
             Occupied(mut x)=>{
                 let old=*x.get();
                 let y=old*(1.0-UPDATE_COEFF)+UPDATE_COEFF*diff;
@@ -39,6 +39,6 @@ where IdT:std::cmp::Eq+Hash+Copy
             }
         };
 
-        diff.round() as i64
+        shift.round() as i64
     }
 }
