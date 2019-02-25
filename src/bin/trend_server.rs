@@ -25,9 +25,11 @@ use gp_daq::msg_def::TrendMsg;
 use gp_daq::net::client::send_msg;
 use gp_daq::net::server::TrendServer;
 use gp_daq::utils::add_source_info;
-
+use gp_daq::net::ts_cal::TsCal;
 //deprecated
 //use gp_daq::io::txt;
+
+const COOL_TIME:i64=1;
 
 fn main() {
     //let args: Vec<_> = std::env::args().collect();
@@ -182,6 +184,9 @@ fn main() {
 
     let save_ack=matches.is_present("save_ack");
 
+    let mut last_ip=0;
+    let mut last_msg_time=0;
+
     server_slc.register_handler(Box::new(move |msg, socket| {
         let now = Utc::now();
 
@@ -208,6 +213,12 @@ fn main() {
                 }
             },
             ref msg => {
+                let t=now.timestamp();
+                if ip[3]==last_ip && (t-last_msg_time).abs()<COOL_TIME{
+                    return;
+                }
+                last_ip=ip[3];
+                last_msg_time=t;
                 let mut v = msg.to_yaml();
                 add_source_info(&mut v, &now, &ip[..]);
                 if let Some(f)=yaml_file.as_mut(){
@@ -219,14 +230,24 @@ fn main() {
         //msg.write_to_txt(&mut txt_file, &now).unwrap();
     }));
 
+
+    let mut tscal=TsCal::<(u8,u8, u8,u8)>::new();
+
     server_data.register_handler(Box::new(move |msg, socket| {
         let now = Utc::now();
+        let ts_sys=now.timestamp() as f64+now.timestamp_subsec_nanos() as f64*1e-9;
 
         let ip: Vec<i64> = if let std::net::SocketAddr::V4(x) = socket {
             x.ip().octets().iter().map(|&x| i64::from(x)).collect()
         } else {
             panic!("Ipv6 is not supported")
         };
+
+        let ip_u8=(ip[0] as u8,
+                   ip[1] as u8,
+                   ip[2] as u8,
+                   ip[3] as u8,
+        );
         match *msg {
             TrendMsg::Data {
                 ref content,
@@ -235,11 +256,23 @@ fn main() {
                 if verbose > 0 {
                     eprint!(".");
                 }
-                let ev = Event::from_trend_data(&content, &payload);
+
+                let ts_board=content.sss() as f64+(f64::from(
+                    4 * content.ts2() + u32::from(content.ts1pps()) - u32::from(content.ts1trigger()),
+                ) * 2.1);
+
+                let d=tscal.update(ip_u8.clone(), ts_sys, ts_board);
+
+
+                let mut content1=content.clone();
+
+
+                let ev = Event::from_trend_data(&content1, &payload, d as i32);
                 if let Some(f) = bin_file.as_mut() {
                     ev.write_to(f);
                 }
                 let mut v = msg.to_yaml();
+                v["sss_corr"]=From::from(d);
                 add_source_info(&mut v, &now, &ip[..]);
                 //tx_data.send(v).expect("send err3");
                 if let Some(f) = yaml_file_data.as_mut() {

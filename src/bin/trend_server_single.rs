@@ -83,7 +83,7 @@ fn main() {
                     ref content,
                     ref payload,
                 } => {
-                    let ev = Event::from_trend_data(&content, &payload);
+                    let ev = Event::from_trend_data(&content, &payload, 0);
                     ev.write_to(&mut bin_file);
                     let mut v = msg.to_yaml();
                     v["received_timestamp"] = From::from(vec![
