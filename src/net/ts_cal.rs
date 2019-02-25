@@ -11,7 +11,7 @@ where IdT:std::cmp::Eq+Hash
     shifts:HashMap<IdT, f64>,
 }
 
-const UPDATE_COEFF:f64=0.1;
+const UPDATE_COEFF:f64=0.01;
 
 impl<IdT> TsCal<IdT>
 where IdT:std::cmp::Eq+Hash+Copy
