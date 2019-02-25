@@ -27,7 +27,7 @@ where IdT:std::cmp::Eq+Hash+Copy
             Occupied(mut x)=>{
                 let old=*x.get();
                 let y=old*(1.0-UPDATE_COEFF)+UPDATE_COEFF*diff;
-                if(old-y).abs()>2.0{
+                if(old-y).abs()>=1.0{
                     eprintln!("WARNING, ts jump");
                 }
                 *x.get_mut()=y;
