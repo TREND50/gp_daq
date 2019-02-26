@@ -172,14 +172,14 @@ pub struct EventHeader {
 }
 
 impl EventHeader {
-    pub fn from_trend_data(cont: &Data, sss_corr:i32) -> Self {
+    pub fn from_trend_data(cont: &Data, sss_corr: i32) -> Self {
         EventHeader {
             header_length: 0,
             runnr: 0,
             eventnr: cont.event_count() as u32,
             t3eventnr: 0,
             first_ls: 0,
-            event_sec: (i32::from(cont.sss())+sss_corr) as u32,
+            event_sec: (i32::from(cont.sss()) + sss_corr) as u32,
             event_nsec: (f64::from(
                 4 * cont.ts2() + u32::from(cont.ts1pps()) - u32::from(cont.ts1trigger()),
             ) * 2.0) as u32,
@@ -242,13 +242,13 @@ pub struct LocalStationHeader {
 }
 
 impl LocalStationHeader {
-    pub fn from_trend_data(cont: &Data, sss_corr:i32) -> Self {
+    pub fn from_trend_data(cont: &Data, sss_corr: i32) -> Self {
         LocalStationHeader {
             length: 0,
             event_nr: cont.event_count() as u16,
             ls_id: (cont.ip() & 0xffff) as u16,
             header_length: 0,
-            gps_seconds: (i32::from(cont.sss())+sss_corr) as u32,
+            gps_seconds: (i32::from(cont.sss()) + sss_corr) as u32,
             gps_nanoseconds: (f64::from(
                 4 * cont.ts2() + u32::from(cont.ts1pps()) - u32::from(cont.ts1trigger()),
             ) * 2.1) as u32,
@@ -279,12 +279,14 @@ impl Display for LocalStationHeader {
                                                     f,
                                                     "adc_resolution: {}",
                                                     self.adc_resolution
-                                                ).and(
+                                                )
+                                                .and(
                                                     writeln!(
                                                         f,
                                                         "trace_length: {}",
                                                         self.trace_length
-                                                    ).and(writeln!(f, "version: {}", self.version)),
+                                                    )
+                                                    .and(writeln!(f, "version: {}", self.version)),
                                                 ),
                                             ),
                                         ),
@@ -399,7 +401,7 @@ impl Event {
         self.header.header_length = self.size() as u32 - 4;
     }
 
-    pub fn from_trend_data(cont: &Data, adc_buffer: &[u16], sss_corr:i32) -> Self {
+    pub fn from_trend_data(cont: &Data, adc_buffer: &[u16], sss_corr: i32) -> Self {
         let ls = LocalStation::new(
             LocalStationHeader::from_trend_data(cont, sss_corr),
             vec![],

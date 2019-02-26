@@ -24,12 +24,12 @@ use gp_daq::msg_def::msgcont::Ack_;
 use gp_daq::msg_def::TrendMsg;
 use gp_daq::net::client::send_msg;
 use gp_daq::net::server::TrendServer;
-use gp_daq::utils::add_source_info;
 use gp_daq::net::ts_cal::TsCal;
+use gp_daq::utils::add_source_info;
 //deprecated
 //use gp_daq::io::txt;
 
-const COOL_TIME:i64=1;
+const COOL_TIME: i64 = 1;
 
 fn main() {
     //let args: Vec<_> = std::env::args().collect();
@@ -122,14 +122,16 @@ fn main() {
         "{}:{}",
         matches.value_of("arg_server_ip").unwrap(),
         matches.value_of("arg_slc_port").unwrap()
-    ).parse()
+    )
+    .parse()
     .expect("Invalid slc port");
 
     let addr_data: SocketAddr = format!(
         "{}:{}",
         matches.value_of("arg_server_ip").unwrap(),
         matches.value_of("arg_data_port").unwrap()
-    ).parse()
+    )
+    .parse()
     .expect("Invalid data port");
 
     let mut server_slc = TrendServer::new(addr_slc);
@@ -182,10 +184,10 @@ fn main() {
         fh.write_to(f);
     });
 
-    let save_ack=matches.is_present("save_ack");
+    let save_ack = matches.is_present("save_ack");
 
-    let mut last_ip=0;
-    let mut last_msg_time=0;
+    let mut last_ip = 0;
+    let mut last_msg_time = 0;
 
     server_slc.register_handler(Box::new(move |msg, socket| {
         let now = Utc::now();
@@ -230,12 +232,11 @@ fn main() {
         //msg.write_to_txt(&mut txt_file, &now).unwrap();
     }));
 
-
-    let mut tscal=TsCal::<(u8,u8, u8,u8)>::new();
+    let mut tscal = TsCal::<(u8, u8, u8, u8)>::new();
 
     server_data.register_handler(Box::new(move |msg, socket| {
         let now = Utc::now();
-        let ts_sys=now.timestamp() as f64+f64::from(now.timestamp_subsec_nanos())*1e-9;
+        let ts_sys = now.timestamp() as f64 + f64::from(now.timestamp_subsec_nanos()) * 1e-9;
 
         let ip: Vec<i64> = if let std::net::SocketAddr::V4(x) = socket {
             x.ip().octets().iter().map(|&x| i64::from(x)).collect()
@@ -243,11 +244,7 @@ fn main() {
             panic!("Ipv6 is not supported")
         };
 
-        let ip_u8=(ip[0] as u8,
-                   ip[1] as u8,
-                   ip[2] as u8,
-                   ip[3] as u8,
-        );
+        let ip_u8 = (ip[0] as u8, ip[1] as u8, ip[2] as u8, ip[3] as u8);
         match *msg {
             TrendMsg::Data {
                 ref content,
@@ -257,22 +254,22 @@ fn main() {
                     eprint!(".");
                 }
 
-                let ts_board=f64::from(content.sss())+(f64::from(
-                    4 * content.ts2() + u32::from(content.ts1pps()) - u32::from(content.ts1trigger()),
-                ) * 2e-9);
+                let ts_board = f64::from(content.sss())
+                    + (f64::from(
+                        4 * content.ts2() + u32::from(content.ts1pps())
+                            - u32::from(content.ts1trigger()),
+                    ) * 2e-9);
 
-                let d=tscal.update(ip_u8, ts_sys, ts_board);
+                let d = tscal.update(ip_u8, ts_sys, ts_board);
 
-
-                let mut content1=content.clone();
-
+                let mut content1 = content.clone();
 
                 let ev = Event::from_trend_data(&content1, &payload, d as i32);
                 if let Some(f) = bin_file.as_mut() {
                     ev.write_to(f);
                 }
                 let mut v = msg.to_yaml();
-                v["sss_corr"]=From::from(d);
+                v["sss_corr"] = From::from(d);
                 add_source_info(&mut v, &now, &ip[..]);
                 //tx_data.send(v).expect("send err3");
                 if let Some(f) = yaml_file_data.as_mut() {

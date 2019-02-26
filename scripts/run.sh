@@ -46,7 +46,7 @@ fi
 tmux select-pane -t 0
 echo "Now starting server."
 tmux send-keys "cargo run -q --manifest-path $PROG_DIR/Cargo.toml --bin \
-    trend_server --release -- -a 0.0.0.0 -s ${SLC_PORT} -d ${DATA_PORT} -m 8888 -t ${SLC_FILE} -b ${DATA_FILE}.bin -c ${DATA_FILE}.yaml -v 1"  C-m
+    trend_server --release -- -a 0.0.0.0 -A -s ${SLC_PORT} -d ${DATA_PORT} -m 8888 -t ${SLC_FILE} -b ${DATA_FILE}.bin -c ${DATA_FILE}.yaml -v 1"  C-m
 #sleep .5  # Needed on laptop
 echo "Now sending message to board."
 sleep 0.1

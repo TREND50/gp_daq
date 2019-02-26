@@ -93,7 +93,8 @@ impl Decode for Trig {
                     Some(result)
                 }
             }
-        }.map(Trig_)
+        }
+        .map(Trig_)
     }
 }
 
@@ -180,7 +181,8 @@ impl Decode for IntReg {
                 }
                 _ => Some(result),
             }
-        }.map(IntReg_)
+        }
+        .map(IntReg_)
     }
 }
 
