@@ -122,16 +122,14 @@ fn main() {
         "{}:{}",
         matches.value_of("arg_server_ip").unwrap(),
         matches.value_of("arg_slc_port").unwrap()
-    )
-    .parse()
+    ).parse()
     .expect("Invalid slc port");
 
     let addr_data: SocketAddr = format!(
         "{}:{}",
         matches.value_of("arg_server_ip").unwrap(),
         matches.value_of("arg_data_port").unwrap()
-    )
-    .parse()
+    ).parse()
     .expect("Invalid data port");
 
     let mut server_slc = TrendServer::new(addr_slc);

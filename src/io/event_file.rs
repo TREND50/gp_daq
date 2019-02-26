@@ -279,14 +279,12 @@ impl Display for LocalStationHeader {
                                                     f,
                                                     "adc_resolution: {}",
                                                     self.adc_resolution
-                                                )
-                                                .and(
+                                                ).and(
                                                     writeln!(
                                                         f,
                                                         "trace_length: {}",
                                                         self.trace_length
-                                                    )
-                                                    .and(writeln!(f, "version: {}", self.version)),
+                                                    ).and(writeln!(f, "version: {}", self.version)),
                                                 ),
                                             ),
                                         ),

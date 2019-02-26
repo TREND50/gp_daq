@@ -55,8 +55,7 @@ fn main() {
                 .value_name("File name")
                 .required(true)
                 .help("Input yaml file name"),
-        )
-        .arg(
+        ).arg(
             Arg::with_name("output_file")
                 .short("o")
                 .long("output")
@@ -64,8 +63,7 @@ fn main() {
                 .value_name("File name")
                 .required(true)
                 .help(""),
-        )
-        .arg(
+        ).arg(
             Arg::with_name("pattern")
                 .short("p")
                 .long("pattern")
@@ -73,8 +71,7 @@ fn main() {
                 .value_name("pattern")
                 .required(true)
                 .help("The pattern"),
-        )
-        .get_matches();
+        ).get_matches();
 
     let mut infile = File::open(matches.value_of("input_file").unwrap()).expect("Cannot open file");
 

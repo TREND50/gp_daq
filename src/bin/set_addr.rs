@@ -61,8 +61,7 @@ fn main() {
     let mut f =
         File::open(env::args().nth(2).unwrap_or_else(|| {
             panic!("Usage: {} <yaml> <addr:port>", env::args().nth(0).unwrap())
-        }))
-        .expect("Cannot open file");
+        })).expect("Cannot open file");
 
     let monitor_port: u16 = args[4].parse().expect("invalid monitor port");
 
