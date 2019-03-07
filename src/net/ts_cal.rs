@@ -20,7 +20,7 @@ where
     pub cnt: usize,
 }
 
-const UPDATE_COEFF: f64 = 0.01;
+const UPDATE_COEFF: f64 = 0.0001;
 
 impl<IdT> TsCal<IdT>
 where
