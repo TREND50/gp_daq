@@ -248,7 +248,7 @@ fn main() {
                 ref content,
                 ref payload,
             } => {
-                if verbose > 0 {
+                if verbose > 0 && tscal.cnt%1000==0 {
                     eprint!(".");
                 }
 

@@ -13,7 +13,7 @@ where
     IdT: std::cmp::Eq + Hash+Debug,
 {
     shifts: HashMap<IdT, f64>,
-    cnt: usize,
+    pub cnt: usize,
 }
 
 const UPDATE_COEFF: f64 = 0.01;
