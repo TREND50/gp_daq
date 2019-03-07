@@ -6,11 +6,11 @@ use std::fs::File;
 use std::fs::OpenOptions;
 use std::hash::Hash;
 use std::io::{Read, Write};
-
+use std::fmt::Debug;
 #[derive(Default)]
 pub struct TsCal<IdT>
 where
-    IdT: std::cmp::Eq + Hash,
+    IdT: std::cmp::Eq + Hash+Debug,
 {
     shifts: HashMap<IdT, f64>,
     cnt: usize,
@@ -20,7 +20,7 @@ const UPDATE_COEFF: f64 = 0.01;
 
 impl<IdT> TsCal<IdT>
 where
-    IdT: std::cmp::Eq + Hash + Copy,
+    IdT: std::cmp::Eq + Hash + Copy + Debug,
 {
     pub fn new() -> TsCal<IdT> {
         TsCal {
@@ -42,7 +42,14 @@ where
                     panic!();
                 }
                 if self.cnt%1000==0{
-                    eprintln!("{} {} {} {}", sys_ts as u64, board_ts as u64, y.round(), diff);
+                    let mut tsc_file =
+                        OpenOptions::new()
+                            .create(true)
+                            .append(true)
+                            .open("tsdump.txt")
+                            .expect("cannot open text file for data");
+
+                    writeln!(&mut tsc_file, "{} {} {} {}", sys_ts as u64, board_ts as u64, y.round(), diff).unwrap();
                 }
 
                 *x.get_mut() = y;
