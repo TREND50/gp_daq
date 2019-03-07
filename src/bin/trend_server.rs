@@ -259,7 +259,6 @@ fn main() {
                     ) * 2e-9);
 
                 let d = tscal.update(ip_u8, ts_sys, ts_board);
-                //eprintln!("{}", d);
 
                 let mut content1 = content.clone();
 
