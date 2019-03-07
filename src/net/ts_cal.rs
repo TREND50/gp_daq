@@ -49,7 +49,7 @@ where
             Occupied(mut x) => {
                 let old = *x.get();
                 let y = old * (1.0 - UPDATE_COEFF) + UPDATE_COEFF * diff;
-                if ((old-self.frac_corr).round() - (y-self.frac_corr).round()).abs() as i32 >= 1 && self.cnt > 100 {
+                if ((old-self.frac_corr).round() - (y-self.frac_corr).round()).abs().round() as i32 >= 1 && self.cnt > 100 {
                     eprintln!("WARNING, ts jump");
                     eprintln!("ip={:?} sys_ts={} board_ts={} diff={} old={}  y={}, frac={}",ip, sys_ts as u64, board_ts as u64, diff, old, y, self.frac_corr);
                     panic!();
