@@ -29,7 +29,6 @@ where
 
     pub fn update(&mut self, ip: IdT, sys_ts: f64, board_ts: f64) -> i64 {
         let diff = sys_ts - board_ts;
-
         let shift = match self.shifts.entry(ip) {
             Occupied(mut x) => {
                 let old = *x.get();
@@ -38,6 +37,7 @@ where
                     eprintln!("WARNING, ts jump");
                 }
                 *x.get_mut() = y;
+                eprintln!("{} {} {} {}", sys_ts, board_ts, diff, y);
                 y
             }
             Vacant(x) => {
