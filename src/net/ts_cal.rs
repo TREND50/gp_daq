@@ -38,7 +38,7 @@ where
                 let y = old * (1.0 - UPDATE_COEFF) + UPDATE_COEFF * diff;
                 if (old.round() - y.round()).abs() as i32 >= 1 && self.cnt > 100 {
                     eprintln!("WARNING, ts jump");
-                    eprintln!("sys_ts={} board_ts={} diff={} old={}  y={}", sys_ts as u64, board_ts as u64, diff, old, y as u64);
+                    eprintln!("sys_ts={} board_ts={} diff={} old={}  y={}", sys_ts as u64, board_ts as u64, diff, old, y);
                     panic!();
                 }
                 if self.cnt%1000==0{
