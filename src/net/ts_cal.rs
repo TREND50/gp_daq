@@ -54,7 +54,7 @@ where
                     eprintln!("ip={:?} sys_ts={} board_ts={} diff={} old={}  y={}, frac={}",ip, sys_ts as u64, board_ts as u64, diff, old, y, self.frac_corr);
                     panic!();
                 }
-                if self.cnt%1000==0{
+                if self.cnt%100==0{
                     let mut tsc_file =
                         OpenOptions::new()
                             .create(true)
