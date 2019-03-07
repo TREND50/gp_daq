@@ -8,6 +8,10 @@ interfaces = '0.0.4'
 pnet = '0.21.0'
 serde_yaml = '0.8.8'
 tokio = '0.1.14'
+num-traits='0.2.6'
+num-complex = "0.2.1"
+
+
 
 [package]
 authors = ['Gu Junhua <jhgu@nao.cas.cn>']

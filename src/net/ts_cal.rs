@@ -7,6 +7,9 @@ use std::fs::OpenOptions;
 use std::hash::Hash;
 use std::io::{Read, Write};
 use std::fmt::Debug;
+use num_traits::float::FloatConst;
+use num_complex::Complex64;
+use num_traits::Zero;
 #[derive(Default)]
 pub struct TsCal<IdT>
 where
@@ -36,7 +39,9 @@ where
         self.cnt+=1;
 
         if self.cnt%100==0 {
-            let f=self.shifts.iter().map(|(_,v)|{v-v.round()}).fold(0.0, |a,b|{a+b})/self.shifts.len() as f64;
+            let f=(self.shifts.iter().map(|(_,v)|{
+                (Complex64::i()*(v-v.floor())*2.0*f64::PI()).exp()
+            }).fold(Complex64::zero(), |a,b|{a+b})/self.shifts.len() as f64).arg()/(2.0*f64::PI());
             self.frac_corr=f;
         }
 
