@@ -37,7 +37,7 @@ where
                     eprintln!("WARNING, ts jump");
                 }
                 *x.get_mut() = y;
-                eprintln!("{} {} {} {}", sys_ts, board_ts, diff, y);
+                eprintln!("{} {} {} {}", sys_ts as u64, board_ts as u64, y as u64, diff);
                 y
             }
             Vacant(x) => {
