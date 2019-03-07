@@ -36,9 +36,9 @@ where
             Occupied(mut x) => {
                 let old = *x.get();
                 let y = old * (1.0 - UPDATE_COEFF) + UPDATE_COEFF * diff;
-                if (old.round() - y.round()).abs() as i32 >= 1 {
+                if (old.round() - y.round()).abs() as i32 >= 1 && self.cnt > 100 {
                     eprintln!("WARNING, ts jump");
-                    eprintln!("{} {} {} {}", sys_ts as u64, board_ts as u64, y as u64, diff);
+                    eprintln!("{} {} {} {} {}", sys_ts as u64, board_ts as u64, y as u64, diff, old);
                     panic!();
                 }
                 if self.cnt%1000==0{
