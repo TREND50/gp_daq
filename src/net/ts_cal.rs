@@ -13,6 +13,7 @@ where
     IdT: std::cmp::Eq + Hash+Debug,
 {
     shifts: HashMap<IdT, f64>,
+    frac_corr:f64,
     pub cnt: usize,
 }
 
@@ -25,6 +26,7 @@ where
     pub fn new() -> TsCal<IdT> {
         TsCal {
             shifts: HashMap::new(),
+            frac_corr:0.0,
             cnt:0,
         }
     }
@@ -32,13 +34,19 @@ where
     pub fn update(&mut self, ip: IdT, sys_ts: f64, board_ts: f64) -> i64 {
         let diff = sys_ts - board_ts;
         self.cnt+=1;
+
+        if self.cnt%100==0 {
+            let f=self.shifts.iter().map(|(_,v)|{v-v.round()}).fold(0.0, |a,b|{a+b})/self.shifts.len() as f64;
+            self.frac_corr=f;
+        }
+
         let shift = match self.shifts.entry(ip) {
             Occupied(mut x) => {
                 let old = *x.get();
                 let y = old * (1.0 - UPDATE_COEFF) + UPDATE_COEFF * diff;
-                if (old.round() - y.round()).abs() as i32 >= 1 && self.cnt > 100 {
+                if ((old-self.frac_corr).round() - (y-self.frac_corr).round()).abs() as i32 >= 1 && self.cnt > 100 {
                     eprintln!("WARNING, ts jump");
-                    eprintln!("ip={:?} sys_ts={} board_ts={} diff={} old={}  y={}",ip, sys_ts as u64, board_ts as u64, diff, old, y);
+                    eprintln!("ip={:?} sys_ts={} board_ts={} diff={} old={}  y={}, frac={}",ip, sys_ts as u64, board_ts as u64, diff, old, y, self.frac_corr);
                     panic!();
                 }
                 if self.cnt%1000==0{
@@ -49,7 +57,7 @@ where
                             .open("tsdump.txt")
                             .expect("cannot open text file for data");
 
-                    writeln!(&mut tsc_file, "{:?} {} {} {} {}",ip, sys_ts as u64, board_ts as u64, y.round(), diff).unwrap();
+                    writeln!(&mut tsc_file, "{:?} {} {} {} {} {}",ip, sys_ts as u64, board_ts as u64, y.round(), diff, self.frac_corr).unwrap();
                 }
 
                 *x.get_mut() = y;
@@ -68,6 +76,6 @@ where
                     };
         writeln!(f, "{} {} {}", shift, sys_ts, board_ts);
         */
-        shift.round() as i64
+        (shift-self.frac_corr).round() as i64
     }
 }
