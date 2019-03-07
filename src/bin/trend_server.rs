@@ -258,7 +258,7 @@ fn main() {
                             - u32::from(content.ts1trigger()),
                     ) * 2e-9);
 
-                let d = tscal.update(ip_u8, ts_sys, ts_board);
+                let d = tscal.update(ip_u8, ts_sys + 0.5, ts_board);
 
                 let mut content1 = content.clone();
 
