@@ -42,7 +42,7 @@ where
                     panic!();
                 }
                 if self.cnt%100==0{
-                    eprintln!("{} {} {} {}", sys_ts as u64, board_ts as u64, y as u64, diff);
+                    eprintln!("{} {} {} {}", sys_ts as u64, board_ts as u64, y.round(), diff);
                 }
 
                 *x.get_mut() = y;
