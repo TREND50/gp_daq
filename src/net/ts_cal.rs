@@ -13,6 +13,7 @@ where
     IdT: std::cmp::Eq + Hash,
 {
     shifts: HashMap<IdT, f64>,
+    cnt: usize,
 }
 
 const UPDATE_COEFF: f64 = 0.01;
@@ -24,11 +25,13 @@ where
     pub fn new() -> TsCal<IdT> {
         TsCal {
             shifts: HashMap::new(),
+            cnt:0,
         }
     }
 
     pub fn update(&mut self, ip: IdT, sys_ts: f64, board_ts: f64) -> i64 {
         let diff = sys_ts - board_ts;
+        self.cnt+=1;
         let shift = match self.shifts.entry(ip) {
             Occupied(mut x) => {
                 let old = *x.get();
@@ -38,6 +41,10 @@ where
                     eprintln!("{} {} {} {}", sys_ts as u64, board_ts as u64, y as u64, diff);
                     panic!();
                 }
+                if self.cnt%100==0{
+                    eprintln!("{} {} {} {}", sys_ts as u64, board_ts as u64, y as u64, diff);
+                }
+
                 *x.get_mut() = y;
                 y
             }
