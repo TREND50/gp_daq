@@ -62,7 +62,7 @@ where
                             .open("tsdump.txt")
                             .expect("cannot open text file for data");
 
-                    writeln!(&mut tsc_file, "{:?} {} {} {} {} {}",ip, sys_ts as u64, board_ts as u64, y, diff, self.frac_corr).unwrap();
+                    writeln!(&mut tsc_file, "{:?} {} {} {} {} {} {}",ip, sys_ts as u64, board_ts as u64, (y-self.frac_corr).round(), y, diff, self.frac_corr).unwrap();
                 }
 
                 *x.get_mut() = y;
