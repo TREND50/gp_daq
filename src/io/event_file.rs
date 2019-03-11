@@ -251,7 +251,7 @@ impl LocalStationHeader {
             gps_seconds: (i32::from(cont.sss()) + sss_corr) as u32,
             gps_nanoseconds: (f64::from(
                 4 * cont.ts2() + u32::from(cont.ts1pps()) - u32::from(cont.ts1trigger()),
-            ) * 2.1) as u32,
+            ) * 2.0) as u32,
             trigger_flag: u16::from(cont.trig_pattern()),
             trigger_pos: 0,
             sampling_freq: 0,
