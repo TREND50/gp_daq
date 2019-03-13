@@ -93,6 +93,9 @@ pub fn send_by_raw(
         write_timeout: None,
         channel_type: ChannelType::Layer2,
         bpf_fd_attempts: 1000,
+        linux_fanout: None,
+
+        
     };
 
     let (mut tx, _) =
