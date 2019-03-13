@@ -5,53 +5,40 @@ SELF_DIR=`dirname $SELF_PATH`
 PROG_DIR=$SELF_DIR/../target/release/
 CFG_DIR=${SELF_DIR}/../cfgs
 
+if [ "x$DATADIR" = x ]
+then
+    echo "set DATADIR first"
+    exit
+fi
+
+
 # Configuration
 #BOARDID=$1
+
+if [ -f $DATADIR/last_run.txt ]
+then
+ :
+ else
+  echo 0 > $DATADIR/last_run.txt
+fi
 NRUN=$(<$DATADIR/last_run.txt)
 NRUN=$(($NRUN+1))
+echo "NRUN=" $NRUN
 
 # Clean
 tmux kill-window -t "minbias"  
-
-${SELF_DIR}/run_server.sh 1235 1236 $DATADIR/M$NRUN.data "minbias"
+# Execute run
+SLC_FILE=$DATADIR/S${NRUN}.yaml
+DATA_FILE=$DATADIR/M${NRUN}.data
 
 cat boardsIn.txt | while read BOARDID
 do
   echo "Now doing board " $BOARDID
-  for i in {1..500}
-  do 
-    echo "Doing event " $i
-    ${PROG_DIR}/send_msg ${CFG_DIR}/minbias.yaml 192.168.1.1${BOARDID}:1234 8888
-  done
-  #sleep 1
-  #$SELF_DIR/run.sh  1235 1236 192.168.1.1${BOARDID} ${CFG_DIR}/slcreq.yaml $DATADIR/S$NRUN'_b'$BOARDID.data "wslc" 0
-  # Get slc data as well
-  #${PROG_DIR}/send_msg ${CFG_DIR}/slcreq.yaml 192.168.1.1${BOARDID}:1234 8888
+  $SELF_DIR/run.sh  ${BOARDID} $CFG_DIR/minbias.yaml 1235 $SLC_FILE 1236 $DATA_FILE "minbias" 100
 done
 
-#BOARDID=09
-#$SELF_DIR/run.sh  1236 192.168.1.1${BOARDID} minbias.cfg $DATADIR/M$NRUN'_b'$BOARDID.data "wmb" 500
-#BOARDID=10
-#$SELF_DIR/run.sh  1236 192.168.1.1${BOARDID} minbias.cfg $DATADIR/M$NRUN'_b'$BOARDID.data "wmb" 500
-#BOARDID=11
-#$SELF_DIR/run.sh  1236 192.168.1.1${BOARDID} minbias.cfg $DATADIR/M$NRUN'_b'$BOARDID.data "wmb" 500
-#BOARDID=25
-#$SELF_DIR/run.sh  1236 192.168.1.1${BOARDID} minbias.cfg $DATADIR/M$NRUN'_b'$BOARDID.data "wmb" 500
-#BOARDID=27
-#$SELF_DIR/run.sh  1236 192.168.1.1${BOARDID} minbias.cfg $DATADIR/M$NRUN'_b'$BOARDID.data "wmb" 500
-#BOARDID=31
-#$SELF_DIR/run.sh  1236 192.168.1.1${BOARDID} minbias.cfg $DATADIR/M$NRUN'_b'$BOARDID.data "wmb" 50
-
-
-#for i in {1..500}
-#do 
-#  echo 'Event' $i
-#  # Execute run
-#  $SELF_DIR/run.sh  1236 192.168.1.1${BOARDID} minbias.cfg $DATADIR/M$NRUN'_b'$BOARDID.data "wmb" 0
-#done
-
 # Log run id
-cp ${CFG_DIR}/minbias.yaml  $DATADIR/M$NRUN'_b'$BOARDID.yaml
+cp ${CFG_DIR}/minbias.yaml  $DATADIR/M$NRUN.yaml
 rm $DATADIR/last_run.txt
 echo $NRUN >> $DATADIR/last_run.txt
 echo "Now killing tmux window minbias." 
