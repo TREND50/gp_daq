@@ -127,6 +127,8 @@ fn main() {
                 );
                 let mut intreg = IntReg_([0; 11]);
                 intreg.set_write(0);
+                //need sleep for while to wait for the board enter a normal state
+                std::thread::sleep(std::time::Duration::new(0, 200_000_000));
                 match send_msg(
                     (
                         std::net::Ipv4Addr::new(bip[0], bip[1], bip[2], bip[3]),
