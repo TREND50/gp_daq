@@ -23,8 +23,11 @@ store ADC data.
 ## Check [doc](doc) for other information
 
 ## ToDo
-- Remove 'ACK' messages in SLC data.
+- Remove "Ack" messages in SLC data.
 - Check and clean "NoAck" information.
-- Implement different trigger levels for different channels and different detection units
-- Clean up & optimise scripts.
+- Implement different trigger levels for different channels and different detection units in [loopPhys.sh](https://github.com/TREND50/gp_daq/blob/master/scripts/loopPhys.sh)
+- More generaly clean up & optimise scripts.
 - Implement Calibration script. May be based on (obsolete) script [gp_DAQ/calib.sh](https://github.com/TREND50/GRANDproto_DAQ/blob/master/calib.sh)
+
+- Longer term: implement online coincidence search.
+- Test DAQ for larger number of antennas.
