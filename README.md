@@ -21,3 +21,10 @@ store ADC data.
   address and ```0.0.0.0:1234``` for server address and port binding.
 
 ## Check [doc](doc) for other information
+
+## ToDo
+- Remove 'ACK' messages in SLC data.
+- Check and clean "NoAck" information.
+- Implement different trigger levels for different channels and different detection units
+- Clean up & optimise scripts.
+- Implement Calibration script. May be based on (obsolete) script [gp_DAQ/calib.sh](https://github.com/TREND50/GRANDproto_DAQ/blob/master/calib.sh)
