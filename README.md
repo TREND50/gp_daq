@@ -23,6 +23,7 @@ store ADC data.
 ## Check [doc](doc) for other information
 
 ## ToDo
+- Solve DAQ stalling issue (see eg R238)
 - Remove "Ack" messages in SLC data.
 - Check and clean "NoAck" information.
 - Implement different trigger levels for different channels and different detection units in [loopPhys.sh](https://github.com/TREND50/gp_daq/blob/master/scripts/loopPhys.sh)
