@@ -16,6 +16,7 @@ CFG=$2
 SLC_PORT=$3
 SLC_FILE=$4
 DATA_PORT=$5
+echo $6
 DATA_FILE=$6
 BPORT=1234  # Fixed port number
 SESSION_NAME=$7

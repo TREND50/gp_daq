@@ -21,3 +21,14 @@ store ADC data.
   address and ```0.0.0.0:1234``` for server address and port binding.
 
 ## Check [doc](doc) for other information
+
+## ToDo
+- Solve DAQ stalling issue (see eg R238)
+- Remove "Ack" messages in SLC data.
+- Check and clean "NoAck" information.
+- Implement different trigger levels for different channels and different detection units in [loopPhys.sh](https://github.com/TREND50/gp_daq/blob/master/scripts/loopPhys.sh)
+- More generaly clean up & optimise scripts.
+- Implement Calibration script. May be based on (obsolete) script [gp_DAQ/calib.sh](https://github.com/TREND50/GRANDproto_DAQ/blob/master/calib.sh)
+
+- Longer term: implement online coincidence search.
+- Test DAQ for larger number of antennas.
