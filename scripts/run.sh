@@ -57,10 +57,10 @@ if [ $loop -gt 1 ]
 then
   for i in $(seq 1 $loop); do 
     echo "Now sending request" $i ", then sleep 0.1s."
-    cargo run -q --manifest-path $PROG_DIR/Cargo.toml --bin send_msg -- $CFG ${BIP}:${BPORT} 8888
+    cargo run -q --manifest-path $PROG_DIR/Cargo.toml --bin send_msg --release -- $CFG ${BIP}:${BPORT} 8888
     sleep 0.1
   done
 else
     echo "Now sending message to board."
-    cargo run -q --manifest-path $PROG_DIR/Cargo.toml --bin send_msg -- $CFG ${BIP}:${BPORT} 8888
+    cargo run -q --manifest-path $PROG_DIR/Cargo.toml --bin send_msg --release -- $CFG ${BIP}:${BPORT} 8888
 fi

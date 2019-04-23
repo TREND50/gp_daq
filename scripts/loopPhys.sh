@@ -27,8 +27,8 @@ else
     cp boardsIn.txt thisBoardsIn.txt
 fi
 
-thl=100
-thh=500
+thl=1000
+thh=1000
 # Start run on all antennas
 cat thisBoardsIn.txt | while read BOARDID
 do
@@ -39,11 +39,11 @@ do
   else
     ./phys.sh $BOARDID $thh $thh $thh $thh $thh $thh 011000 $NRUN  #Warning: ant_on = 0 in phys.sh 
   fi
-  cargo run --bin send_msg --release $CFG_DIR/gps.yaml 192.168.1.1$BOARDID:1234 8888  # Set GPS fixed mode
+  #cargo run --bin send_msg --release $CFG_DIR/gps.yaml 192.168.1.1$BOARDID:1234 8888  # Set GPS fixed mode
 done
 
 echo "Now waiting 60s to lock GPS position..."
-sleep 60  # Wait 10 minutes
+#sleep 60  # Wait 10 minutes
 SLC_FILE=$DATADIR/S${NRUN}.yaml
 DATA_FILE=$DATADIR/R${NRUN}.data
 
@@ -66,7 +66,7 @@ for i in {1..100000}  # Infinite loop
   do
     ./slcreq.sh $BOARDID 0
   done
-  sleep 120
+  sleep 10
 done
 
 
