@@ -22,4 +22,10 @@ $> sudo target/release/set_addr enp3s0f1 scripts/addr.yaml 1234 8888
 
 where ```8888``` is the monitoring port, its value is arbitrary.
 
+You can also run the script ```scripts/set_addr.sh``` as
+```
+$> cd scripts/
+$> ./set_addr.sh $IFACE $MAC_FILE
+```
+
 After running the above commands, the boards should be succesfully initialized. If this is the case, then an ACK msg will be sent back in response to any command from the central DAQ. It will further be forwarded to the set_addr program.
