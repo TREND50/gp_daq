@@ -7,6 +7,9 @@ extern crate serde_yaml;
 
 use clap::{App, Arg, SubCommand};
 
+use std::panic;
+use std::process;
+
 use chrono::offset::Utc;
 use std::env;
 use std::env::args;
@@ -32,6 +35,14 @@ use gp_daq::utils::add_source_info;
 const COOL_TIME: i64 = 1;
 
 fn main() {
+    let orig_handler = panic::take_hook();
+    panic::set_hook(Box::new(move |panic_info| {
+        // invoke the default handler and exit the process
+        orig_handler(panic_info);
+        eprintln!("paniced!");
+        process::exit(1);
+    }));
+
     //let args: Vec<_> = std::env::args().collect();
     let matches=App::new("GRANDproto Data Server")
         .version("0.9")
@@ -248,7 +259,7 @@ fn main() {
                 ref content,
                 ref payload,
             } => {
-                if verbose > 0 && tscal.cnt%1000==0 {
+                if verbose > 0 && tscal.cnt % 1000 == 0 {
                     eprint!(".");
                 }
 

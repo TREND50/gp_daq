@@ -9,7 +9,7 @@ num-complex = '0.2.1'
 num-traits = '0.2.6'
 pnet = '0.22.0'
 serde_yaml = '0.8.8'
-tokio = '0.1.18'
+tokio = '0.1.19'
 
 [package]
 authors = ['Gu Junhua <jhgu@nao.cas.cn>']

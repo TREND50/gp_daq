@@ -1,9 +1,9 @@
 #!/bin/sh
 
-if [ $# -lt 1 ]
+if [ $# -lt 2 ]
 then
-    echo "Usage: " $0 "<ifname>"
+    echo "Usage: " $0 "<ifname> <macfile>"
     exit
 fi
-
-sudo ../target/release/set_addr $1 ./addr1.yaml 1234 888
+./gen_ip_cfg.sh $1 $2 >addr.yaml 
+sudo ../target/release/set_addr $1 ./addr.yaml 1234 8888
