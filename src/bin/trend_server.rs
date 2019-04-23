@@ -271,7 +271,7 @@ fn main() {
 
                 let d = tscal.update(ip_u8, ts_sys + 0.5, ts_board);
 
-                let mut content1 = content.clone();
+                let content1 = content.clone();
 
                 let ev = Event::from_trend_data(&content1, &payload, d as i32);
                 if let Some(f) = bin_file.as_mut() {
