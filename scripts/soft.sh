@@ -1,4 +1,5 @@
 #!/bin/sh
+# Runs soft triggers
 
 SELF_PATH=`realpath $0`
 SELF_DIR=`dirname $SELF_PATH`
