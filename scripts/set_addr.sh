@@ -1,2 +1,2 @@
-sudo ../target/release/set_addr enp3s0f1 ./addr.yaml 1234 888
+sudo ../target/release/set_addr enp0s3 ./addr2.yaml 1234 888
 

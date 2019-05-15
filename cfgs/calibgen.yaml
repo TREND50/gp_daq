@@ -1,0 +1,55 @@
+msg_type: ADC
+addr: 0x00
+reg_func: 0x00
+---
+msg_type: ADC
+addr: 0x04
+reg_func: 0x00
+---
+msg_type: ADC
+addr: 0x0a
+reg_func: 0x00
+---
+msg_type: ADC
+addr: 0x0b
+reg_func: 0x00
+---
+msg_type: ADC
+addr: 0x0c
+reg_func: 0x00
+---
+msg_type: ADC
+addr: 0x0d
+reg_func: 0x481
+---
+msg_type: ADC
+addr: 0x010
+reg_func: 0x00
+---
+msg_type: ADC
+addr: 0x11
+reg_func: 0x00
+---
+msg_type: DAQ
+daq_on: 1
+ant_on: 0b000
+rd_wr_plus: 1
+en_osc: 1
+cntrl_adc: 0b10
+offst: 90
+enable_pd: 0b111
+dis_lna: 0b000
+le: 1
+att1: 0
+att2: 0
+---
+msg_type: TRIG
+st: 0x1
+trg_en: 0b000000
+cntrl_dac: 0
+th1p: 0xfff
+th1m: 0xfff
+th2p: 0xfff
+th2m: 0xfff
+th3p: 0xfff
+th3m: 0xfff
