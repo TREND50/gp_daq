@@ -28,7 +28,7 @@ else
 fi
 
 thl=100
-thh=500
+thh=100
 # Start run on all antennas
 cat thisBoardsIn.txt | while read BOARDID
 do
@@ -43,7 +43,7 @@ do
 done
 
 echo "Now waiting 60s to lock GPS position..."
-sleep 60  # Wait 10 minutes
+#sleep 60  # Wait 10 minutes
 SLC_FILE=$DATADIR/S${NRUN}.yaml
 DATA_FILE=$DATADIR/R${NRUN}.data
 
@@ -66,7 +66,7 @@ for i in {1..100000}  # Infinite loop
   do
     ./slcreq.sh $BOARDID 0
   done
-  sleep 120
+  sleep 10
 done
 
 

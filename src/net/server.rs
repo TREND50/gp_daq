@@ -28,7 +28,7 @@ impl TrendServer {
             let (s, addr) = self.socket.recv_from(&mut buf[..]).unwrap();
             assert!(s <= buf.len());
             unsafe { buf.set_len(s) };
-            //println!("{}", buf.len());
+            //eprintln!("{}", buf.len());
 
             if let Some(ref msg) = TrendMsg::from_byte_vec(buf) {
                 for h in &mut self.handlers {

@@ -15,7 +15,7 @@ the RUST from stable to nightly.
 
 This is done by
 ```
-rustc default nightly
+rustup default nightly
 rustup toolchain remove stable
 ```
 

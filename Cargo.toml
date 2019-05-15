@@ -2,14 +2,14 @@
 bitfield = '0.13.1'
 bytes = '0.4.12'
 chrono = '0.4.6'
-clap = '2.32.0'
+clap = '2.33.0'
 etherparse = '0.8.0'
 interfaces = '0.0.4'
 num-complex = '0.2.1'
 num-traits = '0.2.6'
 pnet = '0.22.0'
 serde_yaml = '0.8.8'
-tokio = '0.1.16'
+tokio = '0.1.19'
 
 [package]
 authors = ['Gu Junhua <jhgu@nao.cas.cn>']
