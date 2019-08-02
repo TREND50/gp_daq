@@ -259,8 +259,8 @@ fn main() {
                 ref content,
                 ref payload,
             } => {
-                if verbose > 0 && tscal.cnt % 1000 == 0 {
-                    eprint!(".");
+                if verbose > 0 && (tscal.cnt + 1 ) % 1000 == 0 {
+                    eprintln!("{}", tscal.cnt+1);
                 }
 
                 let ts_board = f64::from(content.sss())
@@ -277,11 +277,13 @@ fn main() {
                 if let Some(f) = bin_file.as_mut() {
                     ev.write_to(f);
                 }
-                let mut v = msg.to_yaml();
-                v["sss_corr"] = From::from(d);
-                add_source_info(&mut v, &now, &ip[..]);
+
                 //tx_data.send(v).expect("send err3");
                 if let Some(f) = yaml_file_data.as_mut() {
+                    let mut v = msg.to_yaml();
+                    v["sss_corr"] = From::from(d);
+
+                    add_source_info(&mut v, &now, &ip[..]);
                     serde_yaml::to_writer(&mut *f, &v).expect("write failed");
                     writeln!(f).unwrap();
                 }

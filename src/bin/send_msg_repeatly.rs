@@ -2,9 +2,13 @@
 
 extern crate gp_daq;
 extern crate serde_yaml;
+extern crate clap;
 use std::io::Read;
 use std::str;
 //use gp_daq::msgcont::Daq;
+
+use clap::{App, Arg, SubCommand};
+
 use serde_yaml::{from_reader, from_str, Value};
 
 use std::fs::File;
@@ -18,30 +22,58 @@ use gp_daq::io::yaml::YamlIOable;
 use gp_daq::net::client::send_msg;
 
 fn main() {
-    let args: Vec<_> = env::args().collect();
+    let matches=App::new("GRANDproto Data Server")
+        .version("0.9")
+        .author("GU Junhua. jhgu@nao.cas.cn")
+        .about("Receiving TrendMsgs from remote DAQ Boards")
+        .arg(Arg::with_name("cfg_name")
+            .short("i")
+            .long("cfg")
+            .value_name("cfg file name")
+            .required(true)
+            .takes_value(true)
+            .help("cfg file to be sent")
+        )
+        .arg(Arg::with_name("addr_port")
+            .short("a")
+            .long("addr")
+            .value_name("Address:port")
+            .required(true)
+            .takes_value(true)
+            .help("Address:port")
+        )
+        .arg(Arg::with_name("count")
+            .short("c")
+            .long("cnt")
+            .required(true)
+            .takes_value(true)
+            .value_name("counts")
+            .help("counts")
+        ).get_matches();
 
-    if args.len() != 3 {
-        eprintln!("Usage: {} <yaml file> <addr:port>", args[0]);
-        return;
-    }
 
-    let mut f =
-        File::open(env::args().nth(1).unwrap_or_else(|| {
-            panic!("Usage: {} <yaml> <addr:port>", env::args().nth(0).unwrap())
-        })).expect("Cannot open file");
-    let addr = env::args().nth(2).expect("Invalid addr");
+    let cfg_name=matches.value_of("cfg_name").unwrap();
+    let addr=matches.value_of("addr_port").unwrap().to_string();
+    let cnt=matches.value_of("count").unwrap().parse::<usize>().expect("parse count failed");
+
+    let mut f = File::open(cfg_name).expect("Cannot open file");
 
     let mut bytes = Vec::new();
     f.read_to_end(&mut bytes).expect("Cannot read file");
     let msg_str = str::from_utf8(&bytes).unwrap().to_string();
     //let socket = UdpSocket::bind("0.0.0.0:0").expect("bind failed");
-    loop {
-        for s in msg_str.split("---") {
-            let _ = from_str::<Value>(s).map(|v| {
-                //println!("{:?}", v);
-                let daq1 = gp_daq::msg_def::TrendMsg::from_yaml(&v);
-                send_msg(addr.clone(), daq1, None)
-            });
+
+
+    let msgs:Vec<_>=msg_str.split("---").map(|s|{
+        from_str::<Value>(s).map(|v|{
+            gp_daq::msg_def::TrendMsg::from_yaml(&v)
+        })
+    }).filter(|x|{x.is_ok()}).map(|x|{x.unwrap()}).collect();
+
+
+    for _i in 0..cnt{
+        for m in &msgs{
+            send_msg(addr.clone(), m.clone(), None);
         }
     }
 }
