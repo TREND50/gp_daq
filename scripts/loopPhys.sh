@@ -1,3 +1,4 @@
+
 #! /bin/sh
 
 # THis is a script we use to first set GPS mode, wait for lock and then start run. This requires that ant_on = 0 in physgen.yaml
@@ -5,10 +6,10 @@ SELF_PATH=`realpath $0`
 SELF_DIR=`dirname $SELF_PATH`
 CFG_DIR=$SELF_DIR/../cfgs
 
-./loopStop.sh # Stopp all present acquisitions
+#./loopStop.sh # Stopp all present acquisitions
 
 cd ..
- # sudo target/release/set_addr enp3s0f1 ./scripts/addr.yaml 1234 888
+#  sudo target/release/set_addr enp3s0f1 ./scripts/addr.yaml 1234 888
 cd scripts
 
 if [ -f $DATADIR/last_run.txt ]
@@ -28,21 +29,24 @@ else
 fi
 
 thl=100
-thh=100
+thh=500
 # Start run on all antennas
 cat thisBoardsIn.txt | while read BOARDID
 do
   echo ""
   echo "*** Now setting physics run on board" $BOARDID
-  if [ $BOARDID = "03" ] || [ $BOARDID = "05" ] || [ $BOARDID = "09" ] || [ $BOARDID = "18" ] || [ $BOARDID = "19" ] || [ $BOARDID = "16" ] || [ $BOARDID = "06" ]; then
-    ./phys.sh $BOARDID $thl $thl $thl $thl $thl $thl 011000 $NRUN  #Warning: ant_on = 0 in phys.sh
+  if [ $BOARDID = "88" ]  || [ $BOARDID == "20" ]
+  then
+    ./phys.sh $BOARDID $thh $thh $thh $thh $thh $thh 001000 $NRUN  #Warning: ant_on = 0 in phys.sh
   else
-    ./phys.sh $BOARDID $thh $thh $thh $thh $thh $thh 011000 $NRUN  #Warning: ant_on = 0 in phys.sh 
+    ./phys.sh $BOARDID $thl $thl $thl $thl $thl $thl 001000 $NRUN  #Warning: ant_on = 0 in phys.sh 
   fi
+  sleep 1
   cargo run --bin send_msg --release $CFG_DIR/gps.yaml 192.168.1.1$BOARDID:1234 8888  # Set GPS fixed mode
 done
 
 echo "Now waiting 60s to lock GPS position..."
+sleep 1
 #sleep 60  # Wait 10 minutes
 SLC_FILE=$DATADIR/S${NRUN}.yaml
 DATA_FILE=$DATADIR/R${NRUN}.data
@@ -66,7 +70,7 @@ for i in {1..100000}  # Infinite loop
   do
     ./slcreq.sh $BOARDID 0
   done
-  sleep 10
+  sleep 1
 done
 
 

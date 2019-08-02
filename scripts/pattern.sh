@@ -67,7 +67,7 @@ echo 'Calling ' $patterncfg
 # Clean
 tmux kill-window -t "w"
 # Execute run
-$SELF_DIR/run.sh $BOARDID $patterncfg 1235 $SLC_FILE 1236 $DATA_FILE "w" 0
+$SELF_DIR/run.sh $BOARDID $patterncfg 1235 $SLC_FILE 1236 $DATA_FILE "w" 100
 #sleep 2
 
 # Log run id
