@@ -1,5 +1,5 @@
 #![allow(unused_imports)]
-
+extern crate tokio;
 extern crate chrono;
 extern crate clap;
 extern crate gp_daq;
@@ -9,6 +9,12 @@ use clap::{App, Arg, SubCommand};
 
 use std::panic;
 use std::process;
+
+use tokio::codec::Decoder;
+use tokio::net::{UdpFramed, UdpSocket};
+use tokio::prelude::Future;
+use tokio::prelude::Stream;
+
 
 use chrono::offset::Utc;
 use std::env;
@@ -143,30 +149,6 @@ fn main() {
     ).parse()
     .expect("Invalid data port");
 
-    let mut server_slc = TrendServer::new(addr_slc);
-    server_slc.register_handler(Box::new(move |a, b| {
-        println!("recv from {:?}", b);
-        println!("msg:\n{:?}", a);
-    }));
-
-    let mut server_data = TrendServer::new(addr_data);
-    server_slc.register_handler(Box::new(move |a, b| {
-        println!("recv from {:?}", b);
-        println!("msg:\n{:?}", a);
-    }));
-
-    server_slc.register_handler(Box::new(move |a: &TrendMsg, _b| {
-        if let TrendMsg::Ack { content } = a {
-            println!("forwarding ack");
-            let _ = send_msg(
-                format!("127.0.0.1:{}", monitor_port),
-                TrendMsg::Ack {
-                    content: Ack_([content.0[0], content.0[1]]),
-                },
-                None,
-            );
-        }
-    }));
 
     let mut yaml_file = matches.value_of("arg_text_file").map(|fname| {
         OpenOptions::new()
@@ -198,23 +180,53 @@ fn main() {
     let mut last_ip = 0;
     let mut last_msg_time = 0;
 
-    server_slc.register_handler(Box::new(move |msg, socket| {
-        let now = Utc::now();
+    let mut tscal = TsCal::<(u8, u8, u8, u8)>::new();
 
-        let ip: Vec<i64> = if let std::net::SocketAddr::V4(x) = socket {
-            x.ip().octets().iter().map(|&x| i64::from(x)).collect()
-        } else {
-            panic!("Ipv6 is not supported")
-        };
-        match *msg {
-            TrendMsg::Data {..} => {
-                eprintln!("Warning: no data msg is expected to be received through slc port, simply ignore it");
-                //let mut v = msg.to_yaml();
-                //add_source_info(&mut v, &now, &ip[..]);
-                //tx_slc.send(v).expect("send err1");
-            }
-            TrendMsg::Ack { .. } => {
-                if save_ack{
+
+
+    let server_slc = gp_daq::net::server::create_async_server(
+        addr_slc,
+        move |(msg, socket)| {
+            let now = Utc::now();
+
+            let ip: Vec<i64> = if let std::net::SocketAddr::V4(x) = socket {
+                x.ip().octets().iter().map(|&x| i64::from(x)).collect()
+            } else {
+                panic!("Ipv6 is not supported")
+            };
+            match msg {
+                TrendMsg::Data {..} => {
+                    eprintln!("Warning: no data msg is expected to be received through slc port, simply ignore it");
+                    //let mut v = msg.to_yaml();
+                    //add_source_info(&mut v, &now, &ip[..]);
+                    //tx_slc.send(v).expect("send err1");
+                }
+                TrendMsg::Ack { ref content } => {
+                    println!("forwarding ack");
+                    let _ = send_msg(
+                        format!("127.0.0.1:{}", monitor_port),
+                        TrendMsg::Ack {
+                            content: Ack_([content.0[0], content.0[1]]),
+                        },
+                        None,
+                    );
+
+                    if save_ack{
+                        let mut v = msg.to_yaml();
+                        add_source_info(&mut v, &now, &ip[..]);
+                        if let Some(f)=yaml_file.as_mut(){
+                            serde_yaml::to_writer(&mut *f, &v).expect("write failed");
+                            writeln!(f).unwrap();
+                        }
+                    }
+                },
+                ref msg => {
+                    let t=now.timestamp();
+                    if ip[3]==last_ip && (t-last_msg_time).abs()<COOL_TIME{
+                        return Ok(())
+                    }
+                    last_ip=ip[3];
+                    last_msg_time=t;
                     let mut v = msg.to_yaml();
                     add_source_info(&mut v, &now, &ip[..]);
                     if let Some(f)=yaml_file.as_mut(){
@@ -222,88 +234,78 @@ fn main() {
                         writeln!(f).unwrap();
                     }
                 }
-            },
-            ref msg => {
-                let t=now.timestamp();
-                if ip[3]==last_ip && (t-last_msg_time).abs()<COOL_TIME{
-                    return;
-                }
-                last_ip=ip[3];
-                last_msg_time=t;
-                let mut v = msg.to_yaml();
-                add_source_info(&mut v, &now, &ip[..]);
-                if let Some(f)=yaml_file.as_mut(){
-                    serde_yaml::to_writer(&mut *f, &v).expect("write failed");
-                    writeln!(f).unwrap();
-                }
             }
-        }
-        //msg.write_to_txt(&mut txt_file, &now).unwrap();
-    }));
+            //msg.write_to_txt(&mut txt_file, &now).unwrap();
+            Ok(())
+        },
+    );
 
-    let mut tscal = TsCal::<(u8, u8, u8, u8)>::new();
 
-    server_data.register_handler(Box::new(move |msg, socket| {
-        let now = Utc::now();
-        let ts_sys = now.timestamp() as f64 + f64::from(now.timestamp_subsec_nanos()) * 1e-9;
 
-        let ip: Vec<i64> = if let std::net::SocketAddr::V4(x) = socket {
-            x.ip().octets().iter().map(|&x| i64::from(x)).collect()
-        } else {
-            panic!("Ipv6 is not supported")
-        };
 
-        let ip_u8 = (ip[0] as u8, ip[1] as u8, ip[2] as u8, ip[3] as u8);
-        match *msg {
-            TrendMsg::Data {
-                ref content,
-                ref payload,
-            } => {
-                if verbose > 0 && (tscal.cnt + 1 ) % 1000 == 0 {
-                    eprintln!("{}", tscal.cnt+1);
-                }
+    let server_data = gp_daq::net::server::create_async_server(
+        addr_data,
+        move |(msg, socket)| {
+            let now = Utc::now();
+            let ts_sys = now.timestamp() as f64 + f64::from(now.timestamp_subsec_nanos()) * 1e-9;
 
-                let ts_board = f64::from(content.sss())
-                    + (f64::from(
+            let ip: Vec<i64> = if let std::net::SocketAddr::V4(x) = socket {
+                x.ip().octets().iter().map(|&x| i64::from(x)).collect()
+            } else {
+                panic!("Ipv6 is not supported")
+            };
+
+            let ip_u8 = (ip[0] as u8, ip[1] as u8, ip[2] as u8, ip[3] as u8);
+            match msg {
+                TrendMsg::Data {
+                    ref content,
+                    ref payload,
+                } => {
+                    if verbose > 0 && (tscal.cnt + 1 ) % 1000 == 0 {
+                        eprintln!("{}", tscal.cnt+1);
+                    }
+
+                    let ts_board = f64::from(content.sss())
+                        + (f64::from(
                         4 * content.ts2() + u32::from(content.ts1pps())
                             - u32::from(content.ts1trigger()),
                     ) * 2e-9);
 
-                let d = tscal.update(ip_u8, ts_sys + 0.5, ts_board);
+                    let d = tscal.update(ip_u8, ts_sys + 0.5, ts_board);
 
-                let content1 = content.clone();
+                    let content1 = content.clone();
 
-                let ev = Event::from_trend_data(&content1, &payload, d as i32);
-                if let Some(f) = bin_file.as_mut() {
-                    ev.write_to(f);
+                    let ev = Event::from_trend_data(&content1, &payload, d as i32);
+                    if let Some(f) = bin_file.as_mut() {
+                        ev.write_to(f);
+                    }
+
+                    //tx_data.send(v).expect("send err3");
+                    if let Some(f) = yaml_file_data.as_mut() {
+                        let mut v = msg.to_yaml();
+                        v["sss_corr"] = From::from(d);
+                        add_source_info(&mut v, &now, &ip[..]);
+                        serde_yaml::to_writer(&mut *f, &v).expect("write failed");
+                        writeln!(f).unwrap();
+                    }
                 }
-
-                //tx_data.send(v).expect("send err3");
-                if let Some(f) = yaml_file_data.as_mut() {
+                ref msg => {
+                    eprintln!("Warning: only data msgs are expected to be received through data port");
                     let mut v = msg.to_yaml();
-                    v["sss_corr"] = From::from(d);
-
                     add_source_info(&mut v, &now, &ip[..]);
-                    serde_yaml::to_writer(&mut *f, &v).expect("write failed");
-                    writeln!(f).unwrap();
+                    //tx_data.send(v).expect("send err4");
+                    if let Some(f) = yaml_file_data.as_mut() {
+                        serde_yaml::to_writer(&mut *f, &v).expect("write failed");
+                        writeln!(f).unwrap();
+                    }
                 }
             }
-            ref msg => {
-                eprintln!("Warning: only data msgs are expected to be received through data port");
-                let mut v = msg.to_yaml();
-                add_source_info(&mut v, &now, &ip[..]);
-                //tx_data.send(v).expect("send err4");
-                if let Some(f) = yaml_file_data.as_mut() {
-                    serde_yaml::to_writer(&mut *f, &v).expect("write failed");
-                    writeln!(f).unwrap();
-                }
-            }
-        }
-        //msg.write_to_txt(&mut txt_file, &now).unwrap();
-    }));
-    let th_slc = thread::spawn(move || server_slc.run());
-    let th_data = thread::spawn(move || server_data.run());
+            //msg.write_to_txt(&mut txt_file, &now).unwrap();
 
-    th_slc.join().unwrap();
-    th_data.join().unwrap();
+            Ok(())
+        },
+    );
+
+    tokio::run(server_slc.join(server_data).map(|_| {}));
+
 }

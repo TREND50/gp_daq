@@ -27,9 +27,7 @@ fn main() {
         },
     );
 
-    let _j = std::thread::spawn(|| {
-        tokio::run(server1.join(server2).map(|_| {}));
-    });
-    println!("a");
-    //tokio::run(server1);
+
+    tokio::run(server1.join(server2).map(|_| {}));
+
 }
