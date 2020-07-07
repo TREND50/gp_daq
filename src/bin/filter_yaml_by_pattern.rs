@@ -6,7 +6,7 @@ extern crate gp_daq;
 extern crate serde_yaml;
 
 use chrono::offset::Utc;
-use clap::{App, Arg, SubCommand};
+use clap::{App, Arg, Subcommand};
 use std::env;
 use std::env::args;
 use std::fs::{File, OpenOptions};
@@ -49,28 +49,28 @@ fn main() {
         .about("")
         .arg(
             Arg::with_name("input_file")
-                .short("i")
+                .short('i')
                 .long("input")
                 .takes_value(true)
                 .value_name("File name")
                 .required(true)
-                .help("Input yaml file name"),
+                .about("Input yaml file name"),
         ).arg(
             Arg::with_name("output_file")
-                .short("o")
+                .short('o')
                 .long("output")
                 .takes_value(true)
                 .value_name("File name")
                 .required(true)
-                .help(""),
+                .about(""),
         ).arg(
             Arg::with_name("pattern")
-                .short("p")
+                .short('p')
                 .long("pattern")
                 .takes_value(true)
                 .value_name("pattern")
                 .required(true)
-                .help("The pattern"),
+                .about("The pattern"),
         ).get_matches();
 
     let mut infile = File::open(matches.value_of("input_file").unwrap()).expect("Cannot open file");

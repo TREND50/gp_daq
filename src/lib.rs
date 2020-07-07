@@ -10,6 +10,8 @@ extern crate num_traits;
 extern crate pnet;
 extern crate serde_yaml;
 extern crate tokio;
+extern crate tokio_util;
+extern crate futures;
 
 pub mod io;
 pub mod msg_def;

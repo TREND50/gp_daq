@@ -5,9 +5,13 @@ use std;
 use std::net::{SocketAddr, UdpSocket};
 use std::time::Duration;
 //use tokio::codec::Decoder;
-use tokio::net::{UdpFramed, UdpSocket as TUdpSocket};
-use tokio::prelude::Future;
-use tokio::prelude::Stream;
+use tokio::net::{UdpSocket as TUdpSocket};
+use tokio_util::udp::UdpFramed;
+use futures::stream::StreamExt;
+use std::future::Future;
+use futures::future::Ready;
+use futures::executor::block_on;
+
 
 pub struct TrendServer {
     socket: UdpSocket,
@@ -64,14 +68,14 @@ impl TrendServer {
 
 pub fn create_async_server(
     addr: SocketAddr,
-    handler: impl FnMut((TrendMsg, SocketAddr)) -> Result<(), <UdpFramed<MsgDecoder> as Stream>::Error>,
-) -> impl Future<Item = (), Error = ()> {
+    handler: impl FnMut(Result<(TrendMsg, SocketAddr), std::io::Error>)->Ready<()>
+)->impl Future<Output=()>
+ {
     println!("port={}", addr.port());
     UdpFramed::new(
-        TUdpSocket::bind(&addr).expect("bind failed3"),
+        block_on(TUdpSocket::bind(&addr)).expect("binding failed"),
         MsgDecoder {},
     )
     //.for_each(|(msg, _socket)| { Ok(())})
     .for_each(handler)
-    .map_err(|_err| {})
 }

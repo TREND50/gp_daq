@@ -7,7 +7,7 @@ use std::io::Read;
 use std::str;
 //use gp_daq::msgcont::Daq;
 
-use clap::{App, Arg, SubCommand};
+use clap::{App, Arg, Subcommand};
 
 use serde_yaml::{from_reader, from_str, Value};
 
@@ -27,28 +27,28 @@ fn main() {
         .author("GU Junhua. jhgu@nao.cas.cn")
         .about("Receiving TrendMsgs from remote DAQ Boards")
         .arg(Arg::with_name("cfg_name")
-            .short("i")
+            .short('i')
             .long("cfg")
             .value_name("cfg file name")
             .required(true)
             .takes_value(true)
-            .help("cfg file to be sent")
+            .about("cfg file to be sent")
         )
         .arg(Arg::with_name("addr_port")
-            .short("a")
+            .short('a')
             .long("addr")
             .value_name("Address:port")
             .required(true)
             .takes_value(true)
-            .help("Address:port")
+            .about("Address:port")
         )
         .arg(Arg::with_name("count")
-            .short("c")
+            .short('c')
             .long("cnt")
             .required(true)
             .takes_value(true)
             .value_name("counts")
-            .help("counts")
+            .about("counts")
         ).get_matches();
 
 
