@@ -48,7 +48,7 @@ fn main() {
         .author("GU Junhua. jhgu@nao.cas.cn")
         .about("")
         .arg(
-            Arg::with_name("input_file")
+            Arg::new("input_file")
                 .short('i')
                 .long("input")
                 .takes_value(true)
@@ -56,7 +56,7 @@ fn main() {
                 .required(true)
                 .about("Input yaml file name"),
         ).arg(
-            Arg::with_name("output_file")
+            Arg::new("output_file")
                 .short('o')
                 .long("output")
                 .takes_value(true)
@@ -64,7 +64,7 @@ fn main() {
                 .required(true)
                 .about(""),
         ).arg(
-            Arg::with_name("pattern")
+            Arg::new("pattern")
                 .short('p')
                 .long("pattern")
                 .takes_value(true)

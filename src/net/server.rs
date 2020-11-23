@@ -6,8 +6,8 @@ use std::net::{SocketAddr, UdpSocket};
 use std::time::Duration;
 //use tokio::codec::Decoder;
 use tokio::net::{UdpSocket as TUdpSocket};
-use tokio_util::udp::UdpFramed;
-use futures::stream::StreamExt;
+//use tokio_util::udp::UdpFramed;
+//use futures::stream::StreamExt;
 use std::future::Future;
 use futures::future::Ready;
 use futures::executor::block_on;
@@ -66,6 +66,7 @@ impl TrendServer {
     }
 }
 
+/*
 pub fn create_async_server(
     addr: SocketAddr,
     handler: impl FnMut(Result<(TrendMsg, SocketAddr), std::io::Error>)->Ready<()>
@@ -79,3 +80,4 @@ pub fn create_async_server(
     //.for_each(|(msg, _socket)| { Ok(())})
     .for_each(handler)
 }
+*/

@@ -1,23 +1,26 @@
 [dependencies]
 bitfield = '0.13.2'
-bytes = '0.5.5'
-chrono = '0.4.13'
-clap = '3.0.0-beta.1'
+bytes = '0.6.0'
+chrono = '0.4.19'
+clap = '3.0.0-beta.2'
 etherparse = '0.9.0'
+futures = '0.3.8'
 interfaces = '0.0.4'
-num-complex = '0.3.0'
-num-traits = '0.2.12'
+num-complex = '0.3.1'
+num-traits = '0.2.14'
 pnet = '0.26.0'
-serde_yaml = '0.8.13'
-tokio = '0.2.21'
-futures = "0.3"
+serde_yaml = '0.8.14'
+tokio = {version='0.3.4', features=['net']}
 
 [dependencies.tokio-util]
-version='0.3.1'
-features=['udp','codec']
+features = [
+    #'udp',
+    'codec',
+]
+version = '0.5.0'
 
 [package]
 authors = ['Gu Junhua <jhgu@nao.cas.cn>']
+edition = '2018'
 name = 'gp_daq'
 version = '0.1.0'
-edition = "2018"
