@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 SELF_PATH=`realpath $0`
 SELF_DIR=`dirname $SELF_PATH`

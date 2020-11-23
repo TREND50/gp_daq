@@ -18,7 +18,7 @@ else
 fi
 
 
-addr=`${SCRIPTPATH}/get_addr.sh $iface`
+addr=`bash ${SCRIPTPATH}/get_addr.sh $iface`
 mac_addr=`echo $addr|awk '{print $2}'|tr -d ':'`
 ip_addr=`echo $addr |awk '{print $3}'|awk -F \. '{printf("%s, %s, %s, %s", $1, $2, $3, $4)}'`
 subnet_addr=`echo $addr |awk '{print $3}'|awk -F \. '{printf("%s, %s, %s", $1, $2, $3)}'`
